@@ -29,19 +29,20 @@ public class Kirjautuminen extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
+        //tunnukset tietokannasta
+        //MD5
+        
         String hyvaTunnus = "MattiM";
         String vahvaSalasana = "Qwerty1";
-
+        
         String testiTunnus = request.getParameter("tunnus");
         String testiSalasana = request.getParameter("salasana");
         
-        if(hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)){
-            response.sendRedirect("Ehdokas");
-            
-
-    }else{
-        response.sendRedirect("/Vaalikone");
+        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
+            response.sendRedirect("Ehdokas");  
+        } else {
+            response.sendRedirect("/Vaalikone");
         }
     }
 
@@ -86,4 +87,3 @@ public class Kirjautuminen extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 }
-

@@ -6,16 +6,27 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.Integer.parseInt;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import persist.Kysymykset;
+import persist.Vastaukset;
 
 /**
  *
  * @author tomi1404
  */
 public class Ehdokas extends HttpServlet {
+    private final static Logger logger = Logger.getLogger(Loki.class.getName());
 
     /**
      * Processes requests for both HTTP
@@ -29,11 +40,143 @@ public class Ehdokas extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        
+        int kysymys_id;
+
+        // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
+        HttpSession session = request.getSession(true);
+
+        //hae käyttäjä-olio http-sessiosta
+        Kayttaja usr = (Kayttaja) session.getAttribute("usrobj");
+
+        //jos käyttäjä-oliota ei löydy sessiosta, luodaan sinne sellainen
+        if (usr == null) {
+            usr = new Kayttaja();
+            logger.log(Level.FINE, "Luotu uusi käyttäjä-olio");
+            session.setAttribute("usrobj", usr);
+        }
+
+        // Hae tietokanta-yhteys contextista
+        EntityManagerFactory emf
+                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManager em = emf.createEntityManager();
+
+        //hae url-parametri func joka määrittää toiminnon mitä halutaan tehdä.
+        //func=haeEhdokas: hae tietyn ehdokkaan tiedot ja vertaile niitä käyttäjän vastauksiin
+        //Jos ei määritelty, esitetään kysymyksiä.
+        String strFunc = request.getParameter("func");
+        
+        if (strFunc == null) {
+
+            //hae parametrinä tuotu edellisen kysymyksen nro
+            String strKysymys_id = request.getParameter("q");
+
+            //hae parametrina tuotu edellisen kysymyksen vastaus
+            String strVastaus = request.getParameter("vastaus");
+
+            // Jos kysymyksen numero (kysId) on asetettu, haetaan tuo kysymys
+            // muuten haetaan kysnro 1
+            if (strKysymys_id == null) {
+                kysymys_id = 1;
+            } else {
+                kysymys_id = parseInt(strKysymys_id);
+                //jos vastaus on asetettu, tallenna se session käyttäjä-olioon
+                if (strVastaus != null) {
+                    usr.addVastaus(kysymys_id, parseInt(strVastaus));
+                }
+
+                //määritä seuraavaksi haettava kysymys
+                kysymys_id++;
+            }
+
+            //jos kysymyksiä on vielä jäljellä, hae seuraava
+            if (kysymys_id < 20) {
+                try {
+                    //Hae haluttu kysymys tietokannasta
+                    Query q = em.createQuery(
+                            "SELECT k FROM Kysymykset k WHERE k.kysymysId=?1");
+                    q.setParameter(1, kysymys_id);
+                    //Lue haluttu kysymys listaan
+                    List<Kysymykset> kysymysList = q.getResultList();
+                    request.setAttribute("kysymykset", kysymysList);
+                    request.getRequestDispatcher("/vastaus.jsp")
+                            .forward(request, response);
+
+                } finally {
+                    // Sulje tietokantayhteys
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
+                    em.close();
+                }
+
+                //jos kysymykset loppuvat, lasketaan tulos!
+            } else {
+
+                //Tyhjennetään piste-array jotta pisteet eivät tuplaannu mahdollisen refreshin tapahtuessa
+                for (int i = 0; i < 20; i++) {
+                    usr.pisteet.set(i, new Tuple<>(0, 0));
+                }
+
+                //Hae lista ehdokkaista
+                Query qE = em.createQuery(
+                        "SELECT e.ehdokasId FROM Ehdokkaat e"
+                );
+                List<Integer> ehdokasList = qE.getResultList();
+
+                //iteroi ehdokaslista läpi
+                for (int i = 1; i < ehdokasList.size(); i++) {
+
+                    //Hae lista ehdokkaiden vastauksista
+                    Query qV = em.createQuery(
+                            "SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1");
+                    qV.setParameter(1, i);
+                    List<Vastaukset> vastausList = qV.getResultList();
+
+                    //iteroi vastauslista läpi
+                    for (Vastaukset eVastaus : vastausList) {
+                        int pisteet;
+
+                        //hae käyttäjän ehdokaskohtaiset pisteet
+                        pisteet = usr.getPisteet(i);
+
+                        //laske oman ja ehdokkaan vastauksen perusteella pisteet 
+                        pisteet += laskePisteet(usr.getVastaus(i), eVastaus.getVastaus());
+
+                        logger.log(Level.INFO, "eID: {0} / k: {1} / kV: {2} / eV: {3} / p: {4}", new Object[]{i, eVastaus.getVastauksetPK().getKysymysId(), usr.getVastaus(i), eVastaus.getVastaus(), pisteet});
+                        usr.addPisteet(i, pisteet);
+                    }
+
+                }
+
+                //siirrytään hakemaan paras ehdokas
+                strFunc = "haeEhdokas";
+            }
+
+        }
         
         
         
         
         
+    }
+    
+    private Integer laskePisteet(Integer kVastaus, Integer eVastaus) {
+        int pisteet = 0;
+        if (kVastaus - eVastaus == 0) {
+            pisteet = 3;
+        }
+        if (kVastaus - eVastaus == 1 || kVastaus - eVastaus == -1) {
+            pisteet = 2;
+        }
+        if (kVastaus - eVastaus == 2 || kVastaus - eVastaus == -2 || kVastaus - eVastaus == 3 || kVastaus - eVastaus == -3) {
+            pisteet = 1;
+        }
+        
+        //if (kVastaus - eVastaus == 4 || kVastaus - eVastaus == -4) pisteet = 0;
+        return pisteet;
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

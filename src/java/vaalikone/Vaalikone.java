@@ -7,6 +7,7 @@ package vaalikone;
 
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,6 +115,9 @@ public class Vaalikone extends HttpServlet {
                 }
 
                 //jos kysymykset loppuvat, lasketaan tulos!
+                
+                
+                //Lisää vastaukset tietokantaan
             } else {
 
                 //Tyhjennetään piste-array jotta pisteet eivät tuplaannu mahdollisen refreshin tapahtuessa
@@ -194,6 +198,8 @@ public class Vaalikone extends HttpServlet {
             request.setAttribute("parasEhdokas", parasEhdokas);
             request.setAttribute("pisteet", tpl.get(jarjestysnumero).pisteet);
             request.setAttribute("jarjestysnumero", jarjestysnumero);
+            
+            //ohjaa johonkin muuhun sivuun
             request.getRequestDispatcher("/tulokset.jsp")
                     .forward(request, response);
 
