@@ -6,6 +6,9 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,17 +36,34 @@ public class Kirjautuminen extends HttpServlet {
         //tunnukset tietokannasta
         //MD5
         
-        String hyvaTunnus = "MattiM";
-        String vahvaSalasana = "Qwerty1";
+        //luo tietokantayhteys
+        String kayttajatunnus = request.getParameter("kayttajatunnus");
+        String salasana = request.getParameter("salasana");
         
-        String testiTunnus = request.getParameter("tunnus");
-        String testiSalasana = request.getParameter("salasana");
+        //Tietokantayhteyden luominen
+        EntityManagerFactory emf
+                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManager em = emf.createEntityManager();
         
-        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            response.sendRedirect("Ehdokas");  
-        } else {
-            response.sendRedirect("/Vaalikone");
+        Query kt = em.createQuery("SELECT KAYTTAJATUNNUS FROM APP.EHDOKKAAT");
+        
+        String tunnusKentta = request.getParameter("tunnus");
+        String salasanaKentta = request.getParameter("salasana");
+        
+        if (tunnusKentta.equals(kayttajatunnus) && salasanaKentta.equals(salasana)){
+            response.sendRedirect("Ehdokas");
+        } else { 
+            response.sendRedirect("/Login failed");
         }
+        
+//        String hyvaTunnus = "MattiM";
+//        String vahvaSalasana = "Qwerty1";
+        
+//        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
+//            response.sendRedirect("Ehdokas");  
+//        } else {
+//            response.sendRedirect("/Login failed");
+//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
