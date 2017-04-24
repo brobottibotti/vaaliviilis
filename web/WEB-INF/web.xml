@@ -16,6 +16,10 @@
         <servlet-name>Kirjautuminen</servlet-name>
         <servlet-class>vaalikone.Kirjautuminen</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Kirjautuminen_admin</servlet-name>
+        <servlet-class>vaalikone.Kirjautuminen_admin</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Vaalikone</servlet-name>
         <url-pattern>/Vaalikone</url-pattern>
@@ -27,6 +31,10 @@
     <servlet-mapping>
         <servlet-name>Kirjautuminen</servlet-name>
         <url-pattern>/Kirjautuminen</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Kirjautuminen_admin</servlet-name>
+        <url-pattern>/Kirjautuminen_admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
