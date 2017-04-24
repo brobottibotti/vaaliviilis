@@ -31,8 +31,7 @@ import persist.Vastaukset;
 public class Vaalikone extends HttpServlet {
 
     //hae java logger-instanssi
-    private final static Logger logger = Logger.getLogger(Loki.class.getName());
-
+    public final static Logger logger = Logger.getLogger(Loki.class.getName());
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -46,7 +45,7 @@ public class Vaalikone extends HttpServlet {
             throws ServletException, IOException {
 
         int kysymys_id;
-
+        logger.log(Level.INFO, "TÖÖT SAATANA");
         // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
         HttpSession session = request.getSession(true);
 

@@ -25,7 +25,7 @@ public class Loki {
      */
     public static void init(){
         try {
-            fh=new FileHandler("vaalikoneLoki.log", false);
+            fh=new FileHandler("C:/temp/vaalikoneLoki.log", false);
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }

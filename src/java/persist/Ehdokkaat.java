@@ -35,7 +35,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Ehdokkaat.findByIk\u00e4", query = "SELECT e FROM Ehdokkaat e WHERE e.ik\u00e4 = :ik\u00e4"),
     @NamedQuery(name = "Ehdokkaat.findByMiksiEduskuntaan", query = "SELECT e FROM Ehdokkaat e WHERE e.miksiEduskuntaan = :miksiEduskuntaan"),
     @NamedQuery(name = "Ehdokkaat.findByMitaAsioitaHaluatEdistaa", query = "SELECT e FROM Ehdokkaat e WHERE e.mitaAsioitaHaluatEdistaa = :mitaAsioitaHaluatEdistaa"),
-    @NamedQuery(name = "Ehdokkaat.findByAmmatti", query = "SELECT e FROM Ehdokkaat e WHERE e.ammatti = :ammatti")})
+    @NamedQuery(name = "Ehdokkaat.findByAmmatti", query = "SELECT e FROM Ehdokkaat e WHERE e.ammatti = :ammatti"),
+    @NamedQuery(name = "Ehdokkaat.findByKayttajatunnus", query = "SELECT e FROM Ehdokkaat e WHERE e.kayttajatunnus = :kayttajatunnus"),
+    @NamedQuery(name = "Ehdokkaat.findBySalasana", query = "SELECT e FROM Ehdokkaat e WHERE e.salasana = :salasana")})
 public class Ehdokkaat implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -66,6 +68,14 @@ public class Ehdokkaat implements Serializable {
     @Size(max = 50)
     @Column(name = "AMMATTI")
     private String ammatti;
+    @Size(max = 25)
+    @NotNull
+    @Column(name = "KAYTTAJATUNNUS")
+    private String kayttajatunnus;
+    @Size(max = 25)
+    @NotNull
+    @Column(name = "SALASANA")
+    private String salasana;
 
     /**
      *
@@ -223,6 +233,22 @@ public class Ehdokkaat implements Serializable {
      */
     public void setAmmatti(String ammatti) {
         this.ammatti = ammatti;
+    }    
+  
+    public String getKayttajatunnus(){
+        return kayttajatunnus;
+    }
+    
+    public void setKayttajatunnus(String kayttajatunnus){
+        this.kayttajatunnus = kayttajatunnus;
+    }
+    
+    public String getSalasana(){
+        return salasana;
+    }
+    
+    public void setSalasana(String salasana){
+        this.salasana = salasana;
     }
 
     @Override
