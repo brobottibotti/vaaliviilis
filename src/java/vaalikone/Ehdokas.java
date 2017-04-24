@@ -69,7 +69,7 @@ public class Ehdokas extends HttpServlet {
         String strFunc = request.getParameter("func");
         
         if (strFunc == null) {
-
+            
             //hae parametrinä tuotu edellisen kysymyksen nro
             String strKysymys_id = request.getParameter("q");
 
@@ -94,19 +94,22 @@ public class Ehdokas extends HttpServlet {
             //jos kysymyksiä on vielä jäljellä, hae seuraava
             if (kysymys_id < 20) {
                 try {
+                    Ehdokkaat ehdokas = (Ehdokkaat)session.getAttribute("ehdokas");
+                     Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
+                     
                     //Hae haluttu kysymys tietokannasta
                     Query q = em.createQuery(
                             "SELECT k FROM Kysymykset k WHERE k.kysymysId=?1");
                     q.setParameter(1, kysymys_id);
                     
-                    Ehdokkaat ehdokas = (Ehdokkaat)session.getAttribute("ehdokas");
+                    
                     Query t = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1 AND v.vastauksetPK.kysymysId=?2");
                     t.setParameter(1, ehdokas.getEhdokasId());
                     t.setParameter(2, kysymys_id);
                     List<Ehdokkaat> testi = t.getResultList();
                     
                     logger.log(Level.INFO, "eID: {0}", new Object[]{testi});
-                    Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
+                    try{
                     if(testi.size()<1){
                     em.getTransaction().begin();
                         
@@ -120,7 +123,12 @@ public class Ehdokas extends HttpServlet {
                         vastaukset.setVastaus(parseInt(strVastaus));
                         em.merge(vastaukset);
                         em.getTransaction().commit();
+                    }}catch(Exception e){
+                       logger.log(Level.INFO, "eID: {0}", new Object[]{strVastaus});
+
                     }
+                    
+                    
                     
                     //Lue haluttu kysymys listaan
                     List<Kysymykset> kysymysList = q.getResultList();

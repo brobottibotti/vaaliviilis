@@ -43,7 +43,7 @@ public class Kirjautuminen extends HttpServlet {
         String testiSalasana = request.getParameter("salasana");
 
         if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            Ehdokkaat ehdokkaat = new Ehdokkaat(21);
+            Ehdokkaat ehdokkaat = new Ehdokkaat(24);
             session.setAttribute("ehdokas", ehdokkaat);
             session.setAttribute("func", "Ehdokas");
             request.setAttribute("func", "Ehdokas");
