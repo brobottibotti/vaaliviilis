@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Ehdokkaat.findByEtunimi", query = "SELECT e FROM Ehdokkaat e WHERE e.etunimi = :etunimi"),
     @NamedQuery(name = "Ehdokkaat.findByPuolue", query = "SELECT e FROM Ehdokkaat e WHERE e.puolue = :puolue"),
     @NamedQuery(name = "Ehdokkaat.findByKotipaikkakunta", query = "SELECT e FROM Ehdokkaat e WHERE e.kotipaikkakunta = :kotipaikkakunta"),
-    @NamedQuery(name = "Ehdokkaat.findByIk\u00e4", query = "SELECT e FROM Ehdokkaat e WHERE e.ik\u00e4 = :ik\u00e4"),
+    @NamedQuery(name = "Ehdokkaat.findByIkä", query = "SELECT e FROM Ehdokkaat e WHERE e.ikä = :ikä"),
     @NamedQuery(name = "Ehdokkaat.findByMiksiEduskuntaan", query = "SELECT e FROM Ehdokkaat e WHERE e.miksiEduskuntaan = :miksiEduskuntaan"),
     @NamedQuery(name = "Ehdokkaat.findByMitaAsioitaHaluatEdistaa", query = "SELECT e FROM Ehdokkaat e WHERE e.mitaAsioitaHaluatEdistaa = :mitaAsioitaHaluatEdistaa"),
     @NamedQuery(name = "Ehdokkaat.findByAmmatti", query = "SELECT e FROM Ehdokkaat e WHERE e.ammatti = :ammatti")})
@@ -55,7 +55,7 @@ public class Ehdokkaat implements Serializable {
     @Size(max = 25)
     @Column(name = "KOTIPAIKKAKUNTA")
     private String kotipaikkakunta;
-    @Column(name = "IK\u00c4")
+    @Column(name = "IKÄ")
     private Integer ikä;
     @Size(max = 250)
     @Column(name = "MIKSI_EDUSKUNTAAN")

@@ -30,7 +30,7 @@
                 <%= kysymys.getKysymysId() %> / 19 <br>
                 <%= kysymys.getKysymys() %>
                  </div>
-                <form action="Vaalikone" id="vastausformi">
+                <form action="Ehdokas" id="vastausformi">
                     <label>1</label><input type="radio" name="vastaus" value="1" />
                     <label>2</label><input type="radio" name="vastaus" value="2" />
                     <label>3</label><input type="radio" name="vastaus" value="3" checked="checked" />

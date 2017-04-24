@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import persist.Ehdokkaat;
 import persist.Kysymykset;
 import persist.Vastaukset;
 
@@ -97,10 +98,34 @@ public class Ehdokas extends HttpServlet {
                     Query q = em.createQuery(
                             "SELECT k FROM Kysymykset k WHERE k.kysymysId=?1");
                     q.setParameter(1, kysymys_id);
+                    
+                    Ehdokkaat ehdokas = (Ehdokkaat)session.getAttribute("ehdokas");
+                    Query t = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1 AND v.vastauksetPK.kysymysId=?2");
+                    t.setParameter(1, ehdokas.getEhdokasId());
+                    t.setParameter(2, kysymys_id);
+                    List<Ehdokkaat> testi = t.getResultList();
+                    
+                    logger.log(Level.INFO, "eID: {0}", new Object[]{testi});
+                    Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
+                    if(testi.size()<1){
+                    em.getTransaction().begin();
+                        
+                        vastaukset.setVastaus(parseInt(strVastaus));
+                        vastaukset.setKommentti("ehdokkaan "+ ehdokas.getEhdokasId() +" vastaus kysymykseen "+ kysymys_id);
+                        em.persist(vastaukset);
+                        em.getTransaction().commit();
+                    }else{
+                        em.getTransaction().begin();
+                        vastaukset.setKommentti("ehdokkaan "+ ehdokas.getEhdokasId() +" vastaus kysymykseen "+ kysymys_id);
+                        vastaukset.setVastaus(parseInt(strVastaus));
+                        em.merge(vastaukset);
+                        em.getTransaction().commit();
+                    }
+                    
                     //Lue haluttu kysymys listaan
                     List<Kysymykset> kysymysList = q.getResultList();
                     request.setAttribute("kysymykset", kysymysList);
-                    request.getRequestDispatcher("/vastaus.jsp")
+                    request.getRequestDispatcher("/tallennus.jsp")
                             .forward(request, response);
 
                 } finally {
@@ -124,7 +149,7 @@ public class Ehdokas extends HttpServlet {
                         "SELECT e.ehdokasId FROM Ehdokkaat e"
                 );
                 List<Integer> ehdokasList = qE.getResultList();
-
+                
                 //iteroi ehdokaslista läpi
                 for (int i = 1; i < ehdokasList.size(); i++) {
 
@@ -140,7 +165,7 @@ public class Ehdokas extends HttpServlet {
 
                         //hae käyttäjän ehdokaskohtaiset pisteet
                         pisteet = usr.getPisteet(i);
-
+                        
                         //laske oman ja ehdokkaan vastauksen perusteella pisteet 
                         pisteet += laskePisteet(usr.getVastaus(i), eVastaus.getVastaus());
 

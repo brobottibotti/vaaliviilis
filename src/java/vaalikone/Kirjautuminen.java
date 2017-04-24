@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import persist.Ehdokkaat;
 
 /**
  *
@@ -29,18 +31,23 @@ public class Kirjautuminen extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         //tunnukset tietokannasta
         //MD5
-        
+
         String hyvaTunnus = "MattiM";
         String vahvaSalasana = "Qwerty1";
-        
+            HttpSession session = request.getSession(true);
+
         String testiTunnus = request.getParameter("tunnus");
         String testiSalasana = request.getParameter("salasana");
-        
+
         if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            response.sendRedirect("Testii");  
+            Ehdokkaat ehdokkaat = new Ehdokkaat(21);
+            session.setAttribute("ehdokas", ehdokkaat);
+            session.setAttribute("func", "Ehdokas");
+            request.setAttribute("func", "Ehdokas");
+            response.sendRedirect("Ehdokas");
         } else {
             response.sendRedirect("/Vaalikone");
         }

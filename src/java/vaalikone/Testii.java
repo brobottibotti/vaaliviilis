@@ -12,6 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import persist.Ehdokkaat;
 import persist.Vastaukset;
 
 /**
@@ -35,15 +37,17 @@ public class Testii extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            
+            HttpSession session = request.getSession(true);
             EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
             EntityManager em = emf.createEntityManager();
-
-            Vastaukset vastaukset = new Vastaukset(21, 1);
+            
+            em.getTransaction().begin();
+            Ehdokkaat ehdokas = (Ehdokkaat)session.getAttribute("ehdokas");
+            Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), 1);
             vastaukset.setVastaus(1);
             vastaukset.setKommentti("jee");
             em.persist(vastaukset);
-
+            em.getTransaction().commit();
             
             
             /* TODO output your page here. You may use following sample code. */
