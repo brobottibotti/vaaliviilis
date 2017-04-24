@@ -6,16 +6,19 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import persist.Vastaukset;
 
 /**
  *
  * @author tomi1404
  */
-public class Kirjautuminen extends HttpServlet {
+public class Testii extends HttpServlet {
 
     /**
      * Processes requests for both HTTP
@@ -29,20 +32,32 @@ public class Kirjautuminen extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        //tunnukset tietokannasta
-        //MD5
-        
-        String hyvaTunnus = "MattiM";
-        String vahvaSalasana = "Qwerty1";
-        
-        String testiTunnus = request.getParameter("tunnus");
-        String testiSalasana = request.getParameter("salasana");
-        
-        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            response.sendRedirect("Testii");  
-        } else {
-            response.sendRedirect("/Vaalikone");
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            
+            EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
+            EntityManager em = emf.createEntityManager();
+
+            Vastaukset vastaukset = new Vastaukset(21, 1);
+            vastaukset.setVastaus(1);
+            vastaukset.setKommentti("jee");
+            em.persist(vastaukset);
+
+            
+            
+            /* TODO output your page here. You may use following sample code. */
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet Testii</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet Testii at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        } finally {            
+            out.close();
         }
     }
 
