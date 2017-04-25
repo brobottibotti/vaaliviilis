@@ -59,11 +59,14 @@ public class Kirjautuminen extends HttpServlet {
         List<Ehdokkaat> tunnukset = kt.getResultList();    
         
         if(tunnukset.contains(tunnusKentta)){
-            logger.log(Level.INFO,"Oikein!");
-            Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e");
-            List<Ehdokkaat> salasanat = sn.getResultList();
+            logger.log(Level.INFO,"Käyttäjätunnus oikein!");
+            Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e WHERE e.kayttajatunnus=?1");
+            sn.setParameter(1, tunnusKentta);
             
-                if(salasanat.contains(salasanaKentta)){
+//            List<Ehdokkaat> salasanat = sn.getResultList();
+            String salasana = sn.getSingleResult().toString();
+            
+                if(salasana.contains(salasanaKentta)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
                 }
         }else{
