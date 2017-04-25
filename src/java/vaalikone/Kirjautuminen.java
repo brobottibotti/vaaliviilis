@@ -56,15 +56,23 @@ public class Kirjautuminen extends HttpServlet {
         EntityManager em = emf.createEntityManager();
         
         Query kt = em.createQuery("SELECT e.kayttajatunnus FROM Ehdokkaat e");
-        List<Ehdokkaat> tunnukset = kt.getResultList();        
-        for (int i=0; i < tunnukset.size(); i++){
-        logger.log(Level.INFO, "eID: {0} ", new Object[]{tunnukset});
-            if(tunnukset.contains(tunnusKentta)){
-                logger.log(Level.INFO,"Oikein!");
-            }else{
-                logger.log(Level.INFO,"Väärin!");
-            }
+        List<Ehdokkaat> tunnukset = kt.getResultList();    
+        
+        if(tunnukset.contains(tunnusKentta)){
+            logger.log(Level.INFO,"Oikein!");
+            Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e");
+            List<Ehdokkaat> salasanat = sn.getResultList();
+            
+                if(salasanat.contains(salasanaKentta)){
+                    logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
+                }
+        }else{
+            logger.log(Level.INFO,"Käyttäjätunnus väärin!");
         }
+        
+//        for (int i=0; i < tunnukset.size(); i++){
+//        logger.log(Level.INFO, "eID: {0} ", new Object[]{tunnukset});
+//        }
 
      
        
