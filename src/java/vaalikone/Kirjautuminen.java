@@ -9,14 +9,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import persist.Ehdokkaat;
 import static vaalikone.Vaalikone.logger;
 
@@ -25,8 +26,6 @@ import static vaalikone.Vaalikone.logger;
  * @author tomi1404
  */
 public class Kirjautuminen extends HttpServlet {
-
-    
       
     /**
      * Processes requests for both HTTP
@@ -68,7 +67,7 @@ public class Kirjautuminen extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //MD5
+        HttpSession session = request.getSession(true);
         
         //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
         //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
@@ -94,21 +93,28 @@ public class Kirjautuminen extends HttpServlet {
             String salasana = sn.getSingleResult().toString();
                 if(salasana.contains(salasanaKentta)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
+                    Query id = em.createQuery("SELECT e.ehdokasId FROM Ehdokkaat e WHERE e.kayttajatunnus=?1 AND e.salasana=?2");
+                    id.setParameter(1, tunnusKentta);
+                    id.setParameter(2, salasanaKentta);
+                    Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
+                    
+                    //Testitulostus                 
+                    logger.log(Level.INFO, "eID: {0}", new Object[]{ ehdokkaat.getEhdokasId()});
+                    logger.log(Level.INFO,ehdokkaat.getEhdokasId().toString());
+                    
+                    session.setAttribute("ehdokas", ehdokkaat);
+                    session.setAttribute("func", "ehdokas");
+                    response.sendRedirect("Ehdokas");
                 }
         }else{
             logger.log(Level.INFO,"Käyttäjätunnus väärin!");
+             response.sendRedirect("http://localhost:8080/Kirjautuminen");
         }
         
-        response.sendRedirect("Ehdokas");
+
         
 //        for (int i=0; i < tunnukset.size(); i++){
 //        logger.log(Level.INFO, "eID: {0} ", new Object[]{tunnukset});
-//        }
-
-//        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-//            response.sendRedirect("Ehdokas");  
-//        } else {
-//            response.sendRedirect("/Login failed");
 //        }
     }
 
