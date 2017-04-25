@@ -5,7 +5,8 @@
 package vaalikone;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,35 +38,60 @@ public class Kirjautuminen extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    public String crypt(String str) {
+        if (str == null || str.length() == 0) {
+            throw new IllegalArgumentException("String to encript cannot be null or zero length");
+        }
+
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+
+            digester.update(str.getBytes());
+            byte[] hash = digester.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < hash.length; i++) {
+                if ((0xff & hash[i]) < 0x10) {
+                    hexString.append("0" + Integer.toHexString((0xFF & hash[i])));
+                } else {
+                    hexString.append(Integer.toHexString(0xFF & hash[i]));
+                }
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //tunnukset tietokannasta
         //MD5
         
-        //luo tietokantayhteys
-//        String kayttajatunnus = request.getParameter("kayttajatunnus");
-//        String salasana = request.getParameter("salasana");
-        int e = 0;
-        String tunnusKentta = request.getParameter("tunnus");
-        String salasanaKentta = request.getParameter("salasana");
+        //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
+        //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
+        String tunnusKentta = crypt(request.getParameter("tunnus"));
+        String salasanaKentta = crypt(request.getParameter("salasana"));
         
-        //Tietokantayhteyden luominen
+        //Luodaan tietokantayhteys
         EntityManagerFactory emf
                 = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
         
+        //Haetaan käyttäjätunnukset tietokannasta ja viedään ne listaan
         Query kt = em.createQuery("SELECT e.kayttajatunnus FROM Ehdokkaat e");
         List<Ehdokkaat> tunnukset = kt.getResultList();    
         
+        //Etsitään löytyykö listasta käyttäjän käyttäjätunnusta. 
+        //Jos löytyy niin etsitään kyseisen käyttäjänimen salasanaa erillisellä 
+        //tietokantahaulla ja verrataan sitä käyttäjän syöttämään salasanaa.
         if(tunnukset.contains(tunnusKentta)){
-            logger.log(Level.INFO,"Käyttäjätunnus oikein!");
+            logger.log(Level.INFO,"Käyttäjätunnus oikein!");            
             Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e WHERE e.kayttajatunnus=?1");
             sn.setParameter(1, tunnusKentta);
-            
-//            List<Ehdokkaat> salasanat = sn.getResultList();
             String salasana = sn.getSingleResult().toString();
-            
                 if(salasana.contains(salasanaKentta)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
                 }
@@ -73,25 +99,12 @@ public class Kirjautuminen extends HttpServlet {
             logger.log(Level.INFO,"Käyttäjätunnus väärin!");
         }
         
+        response.sendRedirect("Ehdokas");
+        
 //        for (int i=0; i < tunnukset.size(); i++){
 //        logger.log(Level.INFO, "eID: {0} ", new Object[]{tunnukset});
 //        }
 
-     
-       
-        
-        Query sl = em.createQuery("SELECT e.salasana FROM Ehdokkaat e");
-        List<Ehdokkaat> salasanat = sl.getResultList();
-        
-//        if (kt.equals(kayttajatunnus) ){
-            response.sendRedirect("Ehdokas");
-//        } else { 
-//            response.sendRedirect("/Login failed");
-//        }
-        
-//        String hyvaTunnus = "MattiM";
-//        String vahvaSalasana = "Qwerty1";
-        
 //        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
 //            response.sendRedirect("Ehdokas");  
 //        } else {
