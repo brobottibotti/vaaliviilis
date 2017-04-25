@@ -68,6 +68,7 @@ public class Kirjautuminen extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession(true);
+        RequestDispatcher vaaraTunnus = request.getRequestDispatcher("index.jsp");
         
         //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
         //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
@@ -105,10 +106,15 @@ public class Kirjautuminen extends HttpServlet {
                     session.setAttribute("ehdokas", ehdokkaat);
                     session.setAttribute("func", "ehdokas");
                     response.sendRedirect("Ehdokas");
+                }else{
+                    logger.log(Level.INFO,"Salasana väärin!");
+                    request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+                    vaaraTunnus.forward(request, response);
                 }
         }else{
             logger.log(Level.INFO,"Käyttäjätunnus väärin!");
-             response.sendRedirect("http://localhost:8080/Kirjautuminen");
+            request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+            vaaraTunnus.forward(request, response);
         }
         
 

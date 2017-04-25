@@ -12,11 +12,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="style.css" rel="stylesheet" type="text/css">
-
     </head>
     <body>
         <div id="container">
-
             <img id="headerimg" src="Logo.png" width="720" />
             <div class ="kirjautuminen">
                 <h1>Ehdokas login</h1>
@@ -28,10 +26,16 @@
                     <input type="password" name="salasana">
                     <br>
                     <input type="submit" value="Submit">
+                    <br>
+                    <%
+                    String vaaraTunnus=(String)request.getAttribute("vaaraTunnus");
+                    if(vaaraTunnus==null){vaaraTunnus="";}
+                    %>
+                    <%=vaaraTunnus%>
                 </form>
             </div>
             <div class="kysymys">
-                <h1>Vaalikone</h1>
+                <h1>Vaalikoneen JSP-sivut</h1>
             </div>
             <br>
             <form action="Vaalikone">
