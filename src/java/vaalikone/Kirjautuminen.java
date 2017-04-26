@@ -108,20 +108,22 @@ public class Kirjautuminen extends HttpServlet {
             Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e WHERE e.kayttajatunnus=?1");
             sn.setParameter(1, tunnusKenttaMD5);
             String salasana = sn.getSingleResult().toString();
+            
                 if(salasana.contains(salasanaKenttaMD5)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
                     Query id = em.createQuery("SELECT e.ehdokasId FROM Ehdokkaat e WHERE e.kayttajatunnus=?1 AND e.salasana=?2");
                     id.setParameter(1, tunnusKenttaMD5);
                     id.setParameter(2, salasanaKenttaMD5);
-                    Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
                     
+                    //Ehdokkaat sivulle käyttäjä viedään ID:n avulla
+                    Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
                     //Testitulostus                 
                     logger.log(Level.INFO, "eID: {0}", new Object[]{ ehdokkaat.getEhdokasId()});
-                    logger.log(Level.INFO,ehdokkaat.getEhdokasId().toString());
-                    
+                    logger.log(Level.INFO,ehdokkaat.getEhdokasId().toString());            
                     session.setAttribute("ehdokas", ehdokkaat);
                     session.setAttribute("func", "ehdokas");
                     response.sendRedirect("Ehdokas");
+                    
                 }else{
                     logger.log(Level.INFO,"Salasana väärin!");
                     request.setAttribute("errTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
