@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +30,7 @@ import persist.Vastaukset;
  * @author tomi1404
  */
 public class Ehdokas extends HttpServlet {
+
     private final static Logger logger = Logger.getLogger(Loki.class.getName());
 
     /**
@@ -42,7 +46,7 @@ public class Ehdokas extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
+
         int kysymys_id;
 
         // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
@@ -59,17 +63,16 @@ public class Ehdokas extends HttpServlet {
         }
 
         // Hae tietokanta-yhteys contextista
-        EntityManagerFactory emf
-                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
 
         //hae url-parametri func joka määrittää toiminnon mitä halutaan tehdä.
         //func=haeEhdokas: hae tietyn ehdokkaan tiedot ja vertaile niitä käyttäjän vastauksiin
         //Jos ei määritelty, esitetään kysymyksiä.
-        String strFunc = request.getParameter("func");
-        
-        if (strFunc == null) {
-            
+
+        String strFunc = session.getAttribute("func").toString();
+        if (strFunc == "Ehdokas") {
+
             //hae parametrinä tuotu edellisen kysymyksen nro
             String strKysymys_id = request.getParameter("q");
 
@@ -86,7 +89,33 @@ public class Ehdokas extends HttpServlet {
                 if (strVastaus != null) {
                     usr.addVastaus(kysymys_id, parseInt(strVastaus));
                 }
+                Ehdokkaat ehdokas = (Ehdokkaat) session.getAttribute("ehdokas");
+                Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
+                Query t = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1 AND v.vastauksetPK.kysymysId=?2");
+                t.setParameter(1, ehdokas.getEhdokasId());
+                t.setParameter(2, kysymys_id);
+                List<Ehdokkaat> testi = t.getResultList();
+                logger.log(Level.INFO, "Onko aiempaa Id:tä: {0}", new Object[]{testi});
+                
+                try {
+                    if (testi.size() < 1) {
+                        em.getTransaction().begin();
+                        vastaukset.setVastaus(parseInt(strVastaus));
+                        vastaukset.setKommentti(request.getParameter("kommentti"));
+                        em.persist(vastaukset);
+                        em.getTransaction().commit();
+                    } else {
+                        em.getTransaction().begin();
+                        vastaukset.setKommentti(request.getParameter("kommentti"));
+                        vastaukset.setVastaus(parseInt(strVastaus));
+                        em.merge(vastaukset);
+                        em.getTransaction().commit();
+                    }
+                    
+                } catch (Exception e) {
+                    logger.log(Level.INFO, "Vastaus arvon testaus: {0}", new Object[]{strVastaus});
 
+                }
                 //määritä seuraavaksi haettava kysymys
                 kysymys_id++;
             }
@@ -94,42 +123,13 @@ public class Ehdokas extends HttpServlet {
             //jos kysymyksiä on vielä jäljellä, hae seuraava
             if (kysymys_id < 20) {
                 try {
-                    Ehdokkaat ehdokas = (Ehdokkaat)session.getAttribute("ehdokas");
-                     Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
-                     
+
+
                     //Hae haluttu kysymys tietokannasta
                     Query q = em.createQuery(
                             "SELECT k FROM Kysymykset k WHERE k.kysymysId=?1");
                     q.setParameter(1, kysymys_id);
-                    
-                    
-                    Query t = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1 AND v.vastauksetPK.kysymysId=?2");
-                    t.setParameter(1, ehdokas.getEhdokasId());
-                    t.setParameter(2, kysymys_id);
-                    List<Ehdokkaat> testi = t.getResultList();
-                    
-                    logger.log(Level.INFO, "eID: {0}", new Object[]{testi});
-                    try{
-                    if(testi.size()<1){
-                    em.getTransaction().begin();
-                        
-                        vastaukset.setVastaus(parseInt(strVastaus));
-                        vastaukset.setKommentti("ehdokkaan "+ ehdokas.getEhdokasId() +" vastaus kysymykseen "+ kysymys_id);
-                        em.persist(vastaukset);
-                        em.getTransaction().commit();
-                    }else{
-                        em.getTransaction().begin();
-                        vastaukset.setKommentti("ehdokkaan "+ ehdokas.getEhdokasId() +" vastaus kysymykseen "+ kysymys_id);
-                        vastaukset.setVastaus(parseInt(strVastaus));
-                        em.merge(vastaukset);
-                        em.getTransaction().commit();
-                    }}catch(Exception e){
-                       logger.log(Level.INFO, "eID: {0}", new Object[]{strVastaus});
 
-                    }
-                    
-                    
-                    
                     //Lue haluttu kysymys listaan
                     List<Kysymykset> kysymysList = q.getResultList();
                     request.setAttribute("kysymykset", kysymysList);
@@ -154,10 +154,9 @@ public class Ehdokas extends HttpServlet {
 
                 //Hae lista ehdokkaista
                 Query qE = em.createQuery(
-                        "SELECT e.ehdokasId FROM Ehdokkaat e"
-                );
+                        "SELECT e.ehdokasId FROM Ehdokkaat e");
                 List<Integer> ehdokasList = qE.getResultList();
-                
+
                 //iteroi ehdokaslista läpi
                 for (int i = 1; i < ehdokasList.size(); i++) {
 
@@ -173,7 +172,7 @@ public class Ehdokas extends HttpServlet {
 
                         //hae käyttäjän ehdokaskohtaiset pisteet
                         pisteet = usr.getPisteet(i);
-                        
+
                         //laske oman ja ehdokkaan vastauksen perusteella pisteet 
                         pisteet += laskePisteet(usr.getVastaus(i), eVastaus.getVastaus());
 
@@ -182,19 +181,13 @@ public class Ehdokas extends HttpServlet {
                     }
 
                 }
-
-                //siirrytään hakemaan paras ehdokas
-                strFunc = "haeEhdokas";
             }
 
         }
-        
-        
-        
-        
-        
+
+
     }
-    
+
     private Integer laskePisteet(Integer kVastaus, Integer eVastaus) {
         int pisteet = 0;
         if (kVastaus - eVastaus == 0) {
@@ -206,7 +199,7 @@ public class Ehdokas extends HttpServlet {
         if (kVastaus - eVastaus == 2 || kVastaus - eVastaus == -2 || kVastaus - eVastaus == 3 || kVastaus - eVastaus == -3) {
             pisteet = 1;
         }
-        
+
         //if (kVastaus - eVastaus == 4 || kVastaus - eVastaus == -4) pisteet = 0;
         return pisteet;
 

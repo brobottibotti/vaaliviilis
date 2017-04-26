@@ -6,6 +6,8 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,17 +39,20 @@ public class Kirjautuminen extends HttpServlet {
 
         String hyvaTunnus = "MattiM";
         String vahvaSalasana = "Qwerty1";
-            HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(true);
+
+        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManager em = emf.createEntityManager();
 
         String testiTunnus = request.getParameter("tunnus");
         String testiSalasana = request.getParameter("salasana");
 
         if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            Ehdokkaat ehdokkaat = new Ehdokkaat(24);
+            //vaihda em.find(Ehdokkaat.class, 22)
+            Ehdokkaat ehdokkaat = new Ehdokkaat(23);
             session.setAttribute("ehdokas", ehdokkaat);
-            session.setAttribute("func", "Ehdokas");
-            request.setAttribute("func", "Ehdokas");
-            response.sendRedirect("Ehdokas");
+            //session.setAttribute("func", "Ehdokas");
+            response.sendRedirect("Admin");
         } else {
             response.sendRedirect("/Vaalikone");
         }
