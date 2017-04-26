@@ -45,7 +45,6 @@ public class Vaalikone extends HttpServlet {
             throws ServletException, IOException {
 
         int kysymys_id;
-        logger.log(Level.INFO, "TÖÖT SAATANA");
         // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
         HttpSession session = request.getSession(true);
 

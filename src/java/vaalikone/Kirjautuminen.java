@@ -68,12 +68,28 @@ public class Kirjautuminen extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession(true);
-        RequestDispatcher vaaraTunnus = request.getRequestDispatcher("index.jsp");
+        RequestDispatcher errTunnus = request.getRequestDispatcher("index.jsp");
         
         //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
         //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
-        String tunnusKentta = crypt(request.getParameter("tunnus"));
-        String salasanaKentta = crypt(request.getParameter("salasana"));
+        String tunnusKentta = request.getParameter("tunnus");
+        String salasanaKentta = request.getParameter("salasana");
+        String tunnusKenttaMD5 = "";
+        String salasanaKenttaMD5 = "";
+        
+        if(tunnusKentta == null || tunnusKentta.length() == 0){
+            request.setAttribute("errTunnus","Syötä tunnukset");
+            errTunnus.forward(request, response);
+        }else{
+            tunnusKenttaMD5 = crypt(tunnusKentta);
+        }
+        
+        if(salasanaKentta == null || salasanaKentta.length() == 0){
+            request.setAttribute("errTunnus","Syötä tunnukset");
+            errTunnus.forward(request, response);
+        }else{
+            salasanaKenttaMD5 = crypt(salasanaKentta);
+        }
         
         //Luodaan tietokantayhteys
         EntityManagerFactory emf
@@ -87,16 +103,16 @@ public class Kirjautuminen extends HttpServlet {
         //Etsitään löytyykö listasta käyttäjän käyttäjätunnusta. 
         //Jos löytyy niin etsitään kyseisen käyttäjänimen salasanaa erillisellä 
         //tietokantahaulla ja verrataan sitä käyttäjän syöttämään salasanaa.
-        if(tunnukset.contains(tunnusKentta)){
+        if(tunnukset.contains(tunnusKenttaMD5)){
             logger.log(Level.INFO,"Käyttäjätunnus oikein!");            
             Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e WHERE e.kayttajatunnus=?1");
-            sn.setParameter(1, tunnusKentta);
+            sn.setParameter(1, tunnusKenttaMD5);
             String salasana = sn.getSingleResult().toString();
-                if(salasana.contains(salasanaKentta)){
+                if(salasana.contains(salasanaKenttaMD5)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
                     Query id = em.createQuery("SELECT e.ehdokasId FROM Ehdokkaat e WHERE e.kayttajatunnus=?1 AND e.salasana=?2");
-                    id.setParameter(1, tunnusKentta);
-                    id.setParameter(2, salasanaKentta);
+                    id.setParameter(1, tunnusKenttaMD5);
+                    id.setParameter(2, salasanaKenttaMD5);
                     Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
                     
                     //Testitulostus                 
@@ -108,13 +124,13 @@ public class Kirjautuminen extends HttpServlet {
                     response.sendRedirect("Ehdokas");
                 }else{
                     logger.log(Level.INFO,"Salasana väärin!");
-                    request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
-                    vaaraTunnus.forward(request, response);
+                    request.setAttribute("errTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+                    errTunnus.forward(request, response);
                 }
         }else{
             logger.log(Level.INFO,"Käyttäjätunnus väärin!");
-            request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
-            vaaraTunnus.forward(request, response);
+            request.setAttribute("errTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+            errTunnus.forward(request, response);
         }
         
 

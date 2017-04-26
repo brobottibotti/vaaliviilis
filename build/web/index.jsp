@@ -28,10 +28,10 @@
                     <input type="submit" value="Submit">
                     <br>
                     <%
-                    String vaaraTunnus=(String)request.getAttribute("vaaraTunnus");
-                    if(vaaraTunnus==null){vaaraTunnus="";}
+                    String errTunnus=(String)request.getAttribute("errTunnus");
+                    if(errTunnus==null){errTunnus="";}
                     %>
-                    <%=vaaraTunnus%>
+                    <%=errTunnus%>
                 </form>
             </div>
             <div class="kysymys">
