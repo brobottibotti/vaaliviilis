@@ -6,10 +6,21 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.logging.Level;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import persist.Adminit;
+import static vaalikone.Vaalikone.logger;
 
 /**
  *
@@ -27,25 +38,90 @@ public class Kirjautuminen_admin extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-  protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+ public String crypt(String str) {
+        if (str == null || str.length() == 0) {
+            throw new IllegalArgumentException("String to encript cannot be null or zero length");
+        }
+
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+
+            digester.update(str.getBytes());
+            byte[] hash = digester.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < hash.length; i++) {
+                if ((0xff & hash[i]) < 0x10) {
+                    hexString.append("0" + Integer.toHexString((0xFF & hash[i])));
+                } else {
+                    hexString.append(Integer.toHexString(0xFF & hash[i]));
+                }
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        //tunnukset tietokannasta
-        //MD5
+        HttpSession session = request.getSession(true);
+        RequestDispatcher vaaraTunnus = request.getRequestDispatcher("adminkirjautuminen.jsp");
         
-        String hyvaTunnus = "MattiM";
-        String vahvaSalasana = "Qwerty1";
+        //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
+        //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
+        String tunnusKentta = crypt(request.getParameter("tunnus_admin"));
+        String salasanaKentta = crypt(request.getParameter("salasana_admin"));
         
-        String testiTunnus = request.getParameter("tunnus_admin");
-        String testiSalasana = request.getParameter("salasana_admin");
-       
+        //Luodaan tietokantayhteys
+        EntityManagerFactory emf
+                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManager em = emf.createEntityManager();
         
-        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            //tähän adminikäyttöliittymän sijainti
-            response.sendRedirect("Ehdokas");  
-        } else {
-            response.sendRedirect("/Vaalikone");
+        //Haetaan käyttäjätunnukset tietokannasta ja viedään ne listaan
+        Query kt = em.createQuery("SELECT a.tunnus FROM Adminit a");
+        List<Adminit> tunnukset = kt.getResultList();    
+        
+        //Etsitään löytyykö listasta käyttäjän käyttäjätunnusta. 
+        //Jos löytyy niin etsitään kyseisen käyttäjänimen salasanaa erillisellä 
+        //tietokantahaulla ja verrataan sitä käyttäjän syöttämään salasanaa.
+        if(tunnukset.contains(tunnusKentta)){
+            logger.log(Level.INFO,"Käyttäjätunnus oikein!");            
+            Query sn = em.createQuery("SELECT e.salasana FROM Adminit e WHERE e.tunnus=?1");
+            sn.setParameter(1, tunnusKentta);
+            String salasana = sn.getSingleResult().toString();
+                if(salasana.contains(salasanaKentta)){
+                    logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
+                    Query id = em.createQuery("SELECT e.id FROM Adminit e WHERE e.tunnus=?1 AND e.salasana=?2");
+                    id.setParameter(1, tunnusKentta);
+                    id.setParameter(2, salasanaKentta);
+                    Adminit adminit = new Adminit (Integer.parseInt(id.getSingleResult().toString()));
+                    
+                    //Testitulostus                 
+                    logger.log(Level.INFO, "eID: {0}", new Object[]{ adminit.getId()});
+                    logger.log(Level.INFO,adminit.getId().toString());
+                    
+                    session.setAttribute("adminit", adminit);
+                    session.setAttribute("func", "adminit");
+                    response.sendRedirect("admin");
+                }else{
+                    logger.log(Level.INFO,"Salasana väärin!");
+                    request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+                    vaaraTunnus.forward(request, response);
+                }
+        }else{
+            logger.log(Level.INFO,"Käyttäjätunnus väärin!");
+            request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+            vaaraTunnus.forward(request, response);
         }
+        
+
+        
+//        for (int i=0; i < tunnukset.size(); i++){
+//        logger.log(Level.INFO, "eID: {0} ", new Object[]{tunnukset});
+//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
