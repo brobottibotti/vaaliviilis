@@ -5,9 +5,15 @@
 package vaalikone;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +26,9 @@ import persist.Ehdokkaat;
  * @author tomi1404
  */
 public class Kirjautuminen extends HttpServlet {
+        private final static Logger logger = Logger.getLogger(Loki.class.getName());
 
+      
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -31,30 +39,102 @@ public class Kirjautuminen extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    public String crypt(String str) {
+        if (str == null || str.length() == 0) {
+            throw new IllegalArgumentException("String to encript cannot be null or zero length");
+        }
+
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+
+            digester.update(str.getBytes());
+            byte[] hash = digester.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < hash.length; i++) {
+                if ((0xff & hash[i]) < 0x10) {
+                    hexString.append("0" + Integer.toHexString((0xFF & hash[i])));
+                } else {
+                    hexString.append(Integer.toHexString(0xFF & hash[i]));
+                }
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        //tunnukset tietokannasta
-        //MD5
-
-        String hyvaTunnus = "MattiM";
-        String vahvaSalasana = "Qwerty1";
+        
         HttpSession session = request.getSession(true);
-
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        RequestDispatcher errTunnus = request.getRequestDispatcher("index.jsp");
+        
+        //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
+        //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
+        String tunnusKentta = request.getParameter("tunnus");
+        String salasanaKentta = request.getParameter("salasana");
+        String tunnusKenttaMD5 = "";
+        String salasanaKenttaMD5 = "";
+        
+        if(tunnusKentta == null || tunnusKentta.length() == 0){
+            request.setAttribute("errTunnus","Syötä tunnukset");
+            errTunnus.forward(request, response);
+        }else{
+            tunnusKenttaMD5 = crypt(tunnusKentta);
+        }
+        
+        if(salasanaKentta == null || salasanaKentta.length() == 0){
+            request.setAttribute("errTunnus","Syötä tunnukset");
+            errTunnus.forward(request, response);
+        }else{
+            salasanaKenttaMD5 = crypt(salasanaKentta);
+        }
+        
+        //Luodaan tietokantayhteys
+        EntityManagerFactory emf
+                = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
-
-        String testiTunnus = request.getParameter("tunnus");
-        String testiSalasana = request.getParameter("salasana");
-
-        if (hyvaTunnus.equals(testiTunnus) && vahvaSalasana.equals(testiSalasana)) {
-            //vaihda em.find(Ehdokkaat.class, 22)
-            Ehdokkaat ehdokkaat = new Ehdokkaat(23);
-            session.setAttribute("ehdokas", ehdokkaat);
-            //session.setAttribute("func", "Ehdokas");
-            response.sendRedirect("Admin");
-        } else {
-            response.sendRedirect("/Vaalikone");
+        
+        //Haetaan käyttäjätunnukset tietokannasta ja viedään ne listaan
+        Query kt = em.createQuery("SELECT e.kayttajatunnus FROM Ehdokkaat e");
+        List<Ehdokkaat> tunnukset = kt.getResultList();    
+        
+        //Etsitään löytyykö listasta käyttäjän käyttäjätunnusta. 
+        //Jos löytyy niin etsitään kyseisen käyttäjänimen salasanaa erillisellä 
+        //tietokantahaulla ja verrataan sitä käyttäjän syöttämään salasanaa.
+        if(tunnukset.contains(tunnusKenttaMD5)){
+            logger.log(Level.INFO,"Käyttäjätunnus oikein!");            
+            Query sn = em.createQuery("SELECT e.salasana FROM Ehdokkaat e WHERE e.kayttajatunnus=?1");
+            sn.setParameter(1, tunnusKenttaMD5);
+            String salasana = sn.getSingleResult().toString();
+            
+                if(salasana.contains(salasanaKenttaMD5)){
+                    logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
+                    Query id = em.createQuery("SELECT e.ehdokasId FROM Ehdokkaat e WHERE e.kayttajatunnus=?1 AND e.salasana=?2");
+                    id.setParameter(1, tunnusKenttaMD5);
+                    id.setParameter(2, salasanaKenttaMD5);
+                    
+                    //Ehdokkaat sivulle käyttäjä viedään ID:n avulla
+                    Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
+                    //Testitulostus                 
+                    logger.log(Level.INFO, "eID: {0}", new Object[]{ ehdokkaat.getEhdokasId()});
+                    logger.log(Level.INFO,ehdokkaat.getEhdokasId().toString());            
+                    session.setAttribute("ehdokas", ehdokkaat);
+                    session.setAttribute("func", "Ehdokas");
+                    response.sendRedirect("Ehdokas");
+                    
+                }else{
+                    logger.log(Level.INFO,"Salasana väärin!");
+                    request.setAttribute("errTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+                    errTunnus.forward(request, response);
+                }
+        }else{
+            logger.log(Level.INFO,"Käyttäjätunnus väärin!");
+            request.setAttribute("errTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
+            errTunnus.forward(request, response);
         }
     }
 
