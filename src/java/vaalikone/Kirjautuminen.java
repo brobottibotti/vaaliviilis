@@ -118,7 +118,7 @@ public class Kirjautuminen extends HttpServlet {
                     id.setParameter(2, salasanaKenttaMD5);
                     
                     //Ehdokkaat sivulle käyttäjä viedään ID:n avulla
-                    Ehdokkaat ehdokkaat = new Ehdokkaat (Integer.parseInt(id.getSingleResult().toString()));
+                    Ehdokkaat ehdokkaat = em.find(Ehdokkaat.class,Integer.parseInt(id.getSingleResult().toString()));
                     //Testitulostus                 
                     logger.log(Level.INFO, "eID: {0}", new Object[]{ ehdokkaat.getEhdokasId()});
                     logger.log(Level.INFO,ehdokkaat.getEhdokasId().toString());            
