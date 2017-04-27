@@ -73,7 +73,7 @@ public class Kirjautuminen_admin extends HttpServlet {
         //Haetaan formista käyttäjän käyttäjätunnus ja salasana, muutetaan  
         //tunnukset MD5-muotoon syöttämällä algoritmille tunnukset.
         String tunnusKentta = crypt(request.getParameter("tunnus_admin"));
-        String salasanaKentta = crypt(request.getParameter("salasana_admin"));
+        String salasanaKentta = crypt(request.getParameter("passu_admin"));
         
         //Luodaan tietokantayhteys
         EntityManagerFactory emf
@@ -82,19 +82,20 @@ public class Kirjautuminen_admin extends HttpServlet {
         
         //Haetaan käyttäjätunnukset tietokannasta ja viedään ne listaan
         Query kt = em.createQuery("SELECT a.tunnus FROM Adminit a");
-        List<Adminit> tunnukset = kt.getResultList();    
+        List<Adminit> tunnukset = kt.getResultList(); 
+        
         
         //Etsitään löytyykö listasta käyttäjän käyttäjätunnusta. 
         //Jos löytyy niin etsitään kyseisen käyttäjänimen salasanaa erillisellä 
         //tietokantahaulla ja verrataan sitä käyttäjän syöttämään salasanaa.
         if(tunnukset.contains(tunnusKentta)){
             logger.log(Level.INFO,"Käyttäjätunnus oikein!");            
-            Query sn = em.createQuery("SELECT e.salasana FROM Adminit e WHERE e.tunnus=?1");
+            Query sn = em.createQuery("SELECT e.passu FROM Adminit e WHERE e.tunnus=?1");
             sn.setParameter(1, tunnusKentta);
             String salasana = sn.getSingleResult().toString();
                 if(salasana.contains(salasanaKentta)){
                     logger.log(Level.INFO,"Käyttäjätunnus oikein, salasana oikein!");
-                    Query id = em.createQuery("SELECT e.id FROM Adminit e WHERE e.tunnus=?1 AND e.salasana=?2");
+                    Query id = em.createQuery("SELECT e.id FROM Adminit e WHERE e.tunnus=?1 AND e.passu=?2");
                     id.setParameter(1, tunnusKentta);
                     id.setParameter(2, salasanaKentta);
                     Adminit adminit = new Adminit (Integer.parseInt(id.getSingleResult().toString()));
@@ -105,7 +106,7 @@ public class Kirjautuminen_admin extends HttpServlet {
                     
                     session.setAttribute("adminit", adminit);
                     session.setAttribute("func", "adminit");
-                    response.sendRedirect("admin");
+                    response.sendRedirect("admin.jsp");
                 }else{
                     logger.log(Level.INFO,"Salasana väärin!");
                     request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
@@ -113,6 +114,8 @@ public class Kirjautuminen_admin extends HttpServlet {
                 }
         }else{
             logger.log(Level.INFO,"Käyttäjätunnus väärin!");
+            String paskaString = Integer.toString(tunnukset.size());
+            logger.log(Level.INFO,paskaString);
             request.setAttribute("vaaraTunnus","Antamasi käyttäjätunnus tai salasana oli väärin");
             vaaraTunnus.forward(request, response);
         }

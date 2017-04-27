@@ -21,34 +21,29 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author elias1403
  */
 @Entity
-@Table(name = "ADMINIT")
+@Table(name = "ADMINIT", schema="APP")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Adminit.findAll", query = "SELECT a FROM Adminit a"),
     @NamedQuery(name = "Adminit.findById", query = "SELECT a FROM Adminit a WHERE a.id = :id"),
-    @NamedQuery(name = "Adminit.findByEtunimi", query = "SELECT a FROM Adminit a WHERE a.etunimi = :etunimi"),
-    @NamedQuery(name = "Adminit.findBySukunimi", query = "SELECT a FROM Adminit a WHERE a.sukunimi = :sukunimi"),
+
     @NamedQuery(name = "Adminit.findByTunnus", query = "SELECT a FROM Adminit a WHERE a.tunnus = :tunnus"),
-    @NamedQuery(name = "Adminit.findBySalasana", query = "SELECT a FROM Adminit a WHERE a.salasana = :salasana")})
+    @NamedQuery(name = "Adminit.findByPassu", query = "SELECT a FROM Adminit a WHERE a.passu = :passu")})
 public class Adminit implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @NotNull
-    @Column(name = "ID")
+    @Column(name = "ADMIN_ID")
     private Integer id;
-    @Size(max = 25)
-    @Column(name = "ETUNIMI")
-    private String etunimi;
-    @Size(max = 25)
-    @Column(name = "SUKUNIMI")
-    private String sukunimi;
     @Size(max = 32)
+    
+    
     @Column(name = "TUNNUS")
     private String tunnus;
     @Size(max = 32)
-    @Column(name = "SALASANA")
-    private String salasana;
+    @Column(name = "PASSU")
+    private String passu;
 
     public Adminit() {
     }
@@ -65,21 +60,12 @@ public class Adminit implements Serializable {
         this.id = id;
     }
 
-    public String getEtunimi() {
-        return etunimi;
-    }
+    
 
-    public void setEtunimi(String etunimi) {
-        this.etunimi = etunimi;
-    }
+    
 
-    public String getSukunimi() {
-        return sukunimi;
-    }
+  
 
-    public void setSukunimi(String sukunimi) {
-        this.sukunimi = sukunimi;
-    }
 
     public String getTunnus() {
         return tunnus;
@@ -89,12 +75,12 @@ public class Adminit implements Serializable {
         this.tunnus = tunnus;
     }
 
-    public String getSalasana() {
-        return salasana;
+    public String getPassu() {
+        return passu;
     }
 
-    public void setSalasana(String salasana) {
-        this.salasana = salasana;
+    public void setPassu(String passu) {
+        this.passu = passu;
     }
 
     @Override

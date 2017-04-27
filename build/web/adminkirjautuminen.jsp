@@ -24,8 +24,8 @@
                     Tunnus:<br>
                     <input type="text" name="tunnus_admin">
                     <br>
-                    Salasana:<br>
-                    <input type="password" name="salasana_admin">
+                    Passu:<br>
+                    <input type="password" name="passu_admin">
                     <br>
                     <input type="submit" value="Submit">
                     <br>
