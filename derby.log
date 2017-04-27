@@ -60,3 +60,8 @@ java.sql.SQLException: Connection authentication failure occurred.  Reason: Inva
 ============= end nested exception, level (1) ===========
 Cleanup action completed
 Wed Apr 26 09:31:50 EEST 2017 Thread[DRDAConnThread_3,5,main] (DATABASE = Vaali-Db), (DRDAID = {1}), Connection authentication failure occurred.  Reason: Invalid authentication..
+----------------------------------------------------------------
+Wed Apr 26 11:41:26 EEST 2017: Shutting down Derby engine
+----------------------------------------------------------------
+Wed Apr 26 11:41:26 EEST 2017:
+Shutting down instance a816c00e-015b-a8f5-736a-ffffb5491fba on database directory P:\Java\Vaalikone\Kirjautuminen\Vaali-Db with class loader sun.misc.Launcher$AppClassLoader@31f39c59 
