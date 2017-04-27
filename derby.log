@@ -1,13 +1,17 @@
-Tue Apr 25 14:22:01 EEST 2017 : Apache Derby Network Server - 10.9.1.0 - (1344872) started and ready to accept connections on port 1527
+Thu Apr 27 12:13:12 EEST 2017 : Apache Derby Network Server - 10.9.1.0 - (1344872) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Tue Apr 25 14:22:25 EEST 2017:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-015b-a4d8-c532-ffffef26524c 
-on database directory P:\Harkka\Vaalikone\Vaali-Db  with class loader sun.misc.Launcher$AppClassLoader@1174ec5 
+Thu Apr 27 12:13:29 EEST 2017:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-015b-aeaf-8fe7-ffff9aae7ed1 
+on database directory P:\Harkka\VaaliViilis\Vaali-Db  with class loader sun.misc.Launcher$AppClassLoader@1174ec5 
 Loaded from file:/C:/Program%20Files/glassfish-4.0/javadb/lib/derby.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.7.0_45-b18
 user.dir=C:\Program Files\glassfish-4.0\javadb
-derby.system.home=P:\Harkka\Vaalikone
+derby.system.home=P:\Harkka\VaaliViilis
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Tue Apr 25 15:53:35 EEST 2017: Shutting down Derby engine
+Thu Apr 27 12:18:55 EEST 2017: Shutting down Derby engine
+----------------------------------------------------------------
+Thu Apr 27 12:18:55 EEST 2017:
+Shutting down instance a816c00e-015b-aeaf-8fe7-ffff9aae7ed1 on database directory P:\Harkka\VaaliViilis\Vaali-Db with class loader sun.misc.Launcher$AppClassLoader@1174ec5 
+----------------------------------------------------------------

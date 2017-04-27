@@ -24,24 +24,34 @@
 
 
 
-        <form action="Admin" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
             Poistettavan kysymyksen id:<br>
             <input type="number" name="poistaK">
             <br>
             <input type="submit" name="kPNappi" value="Submit">
         </form> 
+        <c:choose>
+            <c:when test="${param.ADD == 'kPsuccess'}">
+                <div>Kysymys Lisätty</div>
+            </c:when>
+        </c:choose>
 
 
 
 
-        <form action="Admin" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
             Lisättävä Kysymys:<br>
             <input type="text" name="kysymys" required>
             <br>
             <input type="submit" name="kLNappi" value="Submit">
         </form> 
-        
-        
+
+        <c:choose>
+            <c:when test="${param.ADD == 'kLsuccess'}">
+                <div>Kysymys Lisätty</div>
+            </c:when>
+        </c:choose>
+
         <c:forEach var="ehdokas" items="${eLista}">
             <c:out value="${ehdokas.ehdokasId}"/> 
             <c:out value="${ehdokas.etunimi}"/> 
@@ -49,17 +59,23 @@
             <c:out value="${ehdokas.puolue}"/> 
             <br>
         </c:forEach>
-            
-            
-            <form action="Admin" method="POST" onsubmit="window.location.reload()">
+
+
+        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
             Poistettavan ehdokkaan ID:<br>
             <input type="number" name="poistaE" required>
             <br>
-            <input type="submit" name="pENappi" value="Submit">
+            <input type="submit" name="ePNappi" value="Submit">
         </form> 
-            
-            
-            <form action="Admin" method="POST" onsubmit="window.location.reload()">
+
+        <c:choose>
+            <c:when test="${param.ADD == 'ePsuccess'}">
+                <div>Ehdokas Poistettu</div>
+            </c:when>
+        </c:choose>
+
+
+        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
             Ehdokkaan ID:<br>
             <input type="text" name="LisaaEId" required>
             <br>
@@ -90,6 +106,14 @@
             <input type="submit" name="eLNappi" value="Submit">
         </form> 
 
-            
+        <c:choose>
+            <c:when test="${param.ADD == 'eLsuccess'}">
+                <div>Ehdokas lisätty</div>
+            </c:when>
+            <c:when test="${param.ADD == 'eMsuccess'}">
+                <div>Ehdokas muutettu</div>
+            </c:when>
+        </c:choose>
+
     </body>
 </html>

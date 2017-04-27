@@ -6,6 +6,8 @@ package vaalikone;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,20 +26,22 @@ import persist.Kysymykset;
  *
  * @author tomi1404
  */
-public class Admin extends HttpServlet {
+public class Toiminta extends HttpServlet {
 
     private final static Logger logger = Logger.getLogger(Loki.class.getName());
-    int poistaK = 0;
-    int poistaE = 0;
-    int LisaaEId = 0;
-    String LisaaES;
-    String LisaaEE;
-    String LisaaEP;
-    String LisaaEK;
-    int LisaaEI;
-    String LisaaMAHE;
-    String LisaaEA;
-    String kysymys = "0";
+    private int poistaK = 0;
+    private int poistaE = 0;
+    private int LisaaEId = 0;
+    private String LisaaES;
+    private String LisaaEE;
+    private String LisaaEP;
+    private String LisaaEK;
+    private int LisaaEI;
+    private String LisaaMAHE;
+    private String LisaaEA;
+    private String kysymys = "0";
+    private String ehdokastila;
+    private String LisaaEME;
 
     /**
      * Processes requests for both HTTP
@@ -52,63 +56,7 @@ public class Admin extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-
-        logger.log(Level.FINE, "Luotu uusi käyttäjä-olio");
-
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        EntityManager em = emf.createEntityManager();
-
-        HttpSession session = request.getSession(true);
-
-        request.getRequestDispatcher("/admin.jsp")
-                .forward(request, response);
-
-        Query qK = em.createNamedQuery("Kysymykset.findAll");
-        Query qT = em.createNamedQuery("Ehdokkaat.findAll");
-        List ehdokasLista = qT.getResultList();
-        List kysymysLista = qK.getResultList();
-        session.setAttribute("eLista", ehdokasLista);
-        session.setAttribute("kLista", kysymysLista);
-        logger.log(Level.INFO, "eID: {0}", new Object[]{kysymysLista.size()});
-
-
-        if (request.getParameter("kPNappi") != null) {
-            poistaK = Integer.parseInt(request.getParameter("poistaK"));
-            kysymysPoistaminen(poistaK);
-        }
-//Muokkaa niin että etsitään ensimmäinen tyhjä ksymys id lisättäessä tällä hetkellä haetaan kaikki kysymykset ja id on yhteenlaskettu määrä.
-        if (request.getParameter("kLNappi") != null) {
-
-            kysymys = request.getParameter("kysymys");
-            lisaaKysymys(kysymys, kysymysLista.size());
-            response.sendRedirect("Toiminta?ADD=success");
-            request.setAttribute("kLNappi", "testi");
-            logger.log(Level.INFO, "eID: {0}", new Object[]{request.getParameter("kLNappi")});
-        }
-
-        if (request.getParameter("pENappi") != null) {
-
-            poistaE = Integer.parseInt(request.getParameter("poistaE"));
-            ehdokasPoistaminen(poistaE);
-        }
-
-        if (request.getParameter("eLNappi") != null) {
-
-            LisaaEId = Integer.parseInt(request.getParameter("LisaaEId"));
-            LisaaES = request.getParameter("LisaaES");
-            LisaaEE = request.getParameter("LisaaEE");
-            LisaaEP = request.getParameter("LisaaEP");
-            LisaaEK = request.getParameter("LisaaEK");
-            LisaaEI = Integer.parseInt(request.getParameter("LisaaEI"));
-            LisaaMAHE = request.getParameter("LisaaMAHE");
-            LisaaEA = request.getParameter("LisaaEA");
-            logger.log(Level.INFO, "ES: {0} / EE: {1} / EP: {2} / EK: {3} / EI: {4} / MAHE: {5} / EA: {6}", new Object[]{LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA});
-
-            lisaaEhdokas(LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA);
-
-        }
-
+        
     }
 
     public void kysymysPoistaminen(int p) {
@@ -139,8 +87,41 @@ public class Admin extends HttpServlet {
         em.getTransaction().commit();
 
     }
+    public EntityManager manageri(){
+            EntityManagerFactory emf
+                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+        EntityManager em = emf.createEntityManager();
+        return em;
+    }
+    
+    public String kryptaa(String str) {
+        if (str == null || str.length() == 0) {
+            throw new IllegalArgumentException("String to encript cannot be null or zero length");
+        }
 
-    public void lisaaEhdokas(int id, String s, String e, String p, String k, int ik, String mahe, String a) {
+        MessageDigest digester;
+        try {
+            digester = MessageDigest.getInstance("MD5");
+
+            digester.update(str.getBytes());
+            byte[] hash = digester.digest();
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < hash.length; i++) {
+                if ((0xff & hash[i]) < 0x10) {
+                    hexString.append("0" + Integer.toHexString((0xFF & hash[i])));
+                } else {
+                    hexString.append(Integer.toHexString(0xFF & hash[i]));
+                }
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+
+    public void lisaaEhdokas(int id, String s, String e, String p, String k, int ik, String mahe, String a, String me){
         EntityManager em = manageri();
         em.getTransaction().begin();
         Query t = em.createQuery("SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
@@ -156,7 +137,11 @@ public class Admin extends HttpServlet {
             uusiEhdokas.setIkä(ik);
             uusiEhdokas.setMitaAsioitaHaluatEdistaa(mahe);
             uusiEhdokas.setAmmatti(a);
+            uusiEhdokas.setMiksiEduskuntaan(me);
+            uusiEhdokas.setKayttajatunnus("");
+            uusiEhdokas.setSalasana("");
             em.persist(uusiEhdokas);
+            ehdokastila = "eLsuccess";
         } else {
             Ehdokkaat uusiEhdokas = em.find(Ehdokkaat.class, id);
             uusiEhdokas.setSukunimi(s);
@@ -166,16 +151,12 @@ public class Admin extends HttpServlet {
             uusiEhdokas.setIkä(ik);
             uusiEhdokas.setMitaAsioitaHaluatEdistaa(mahe);
             uusiEhdokas.setAmmatti(a);
+            uusiEhdokas.setMiksiEduskuntaan(me);
             em.merge(uusiEhdokas);
+            ehdokastila = "eMsuccess";
+            
         }
         em.getTransaction().commit();
-
-    }
-
-    public EntityManager manageri() {
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        EntityManager em = emf.createEntityManager();
-        return em;
 
     }
 
@@ -193,12 +174,6 @@ public class Admin extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
-        
-        if(request.getParameter("ADD").equals("kLsuccess")){
-                PrintWriter out = response.getWriter();
-
-            
-        }
     }
 
     /**
@@ -214,6 +189,52 @@ public class Admin extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        HttpSession session = request.getSession(true);
+        EntityManager em = manageri();
+        
+        Query qT = em.createNamedQuery("Ehdokkaat.findAll");
+        Query qK = em.createNamedQuery("Kysymykset.findAll");
+        List ehdokasLista = qT.getResultList();
+        List kysymysLista = qK.getResultList();
+        session.setAttribute("eLista", ehdokasLista);
+        session.setAttribute("kLista", kysymysLista);
+
+        if (request.getParameter("kPNappi") != null) {
+            poistaK = Integer.parseInt(request.getParameter("poistaK"));
+            kysymysPoistaminen(poistaK);
+            response.sendRedirect("Admin?ADD=kPsuccess");
+        }
+        if (request.getParameter("kLNappi") != null) {
+
+            kysymys = request.getParameter("kysymys");
+            lisaaKysymys(kysymys, kysymysLista.size());
+            request.setAttribute("kLNappi", "testi");
+            logger.log(Level.INFO, "eID: {0}", new Object[]{request.getParameter("kLNappi")});
+            response.sendRedirect("Admin?ADD=kLsuccess");
+        }
+        if (request.getParameter("ePNappi") != null) {
+
+            poistaE = Integer.parseInt(request.getParameter("poistaE"));
+            ehdokasPoistaminen(poistaE);
+            response.sendRedirect("Admin?ADD=ePsuccess");
+        }
+
+        if (request.getParameter("eLNappi") != null) {
+
+            LisaaEId = Integer.parseInt(request.getParameter("LisaaEId"));
+            LisaaES = request.getParameter("LisaaES");
+            LisaaEE = request.getParameter("LisaaEE");
+            LisaaEP = request.getParameter("LisaaEP");
+            LisaaEK = request.getParameter("LisaaEK");
+            LisaaEI = Integer.parseInt(request.getParameter("LisaaEI"));
+            LisaaEME = request.getParameter("LisaaEME");
+            LisaaMAHE = request.getParameter("LisaaMAHE");
+            LisaaEA = request.getParameter("LisaaEA");
+            logger.log(Level.INFO, "ES: {0} / EE: {1} / EP: {2} / EK: {3} / EI: {4} / MAHE: {5} / EA: {6}", new Object[]{LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA});
+            lisaaEhdokas(LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA, LisaaEME);
+            response.sendRedirect("Admin?ADD="+ehdokastila);
+
+        }
     }
 
     /**
