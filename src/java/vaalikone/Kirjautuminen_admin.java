@@ -68,9 +68,7 @@ public class Kirjautuminen_admin extends HttpServlet {
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        request.getRequestDispatcher("/adminkirjautuminen.jsp")
-                            .forward(request, response);
+
         
         HttpSession session = request.getSession(true);
         RequestDispatcher vaaraTunnus = request.getRequestDispatcher("adminkirjautuminen.jsp");
