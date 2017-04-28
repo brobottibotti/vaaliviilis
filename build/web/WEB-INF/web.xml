@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
@@ -32,6 +31,10 @@
         <servlet-name>Toiminta</servlet-name>
         <servlet-class>vaalikone.Toiminta</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Kirjautuminen_admin</servlet-name>
+        <servlet-class>vaalikone.Kirjautuminen_admin</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Vaalikone</servlet-name>
         <url-pattern>/Vaalikone</url-pattern>
@@ -55,6 +58,10 @@
     <servlet-mapping>
         <servlet-name>Toiminta</servlet-name>
         <url-pattern>/Toiminta</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Kirjautuminen_admin</servlet-name>
+        <url-pattern>/Kirjautuminen_admin</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

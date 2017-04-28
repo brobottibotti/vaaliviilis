@@ -12,4 +12,5 @@
     </jdbc-connection-pool>
     <jdbc-resource enabled="true" jndi-name="a" object-type="user" pool-name="derby_net_Vaali-Db_aPool"/>
     <jdbc-resource enabled="true" jndi-name="derby" object-type="user" pool-name="derby_net_Vaali-Db_aPool"/>
+    <jdbc-resource enabled="true" jndi-name="Vaali-Db" object-type="user" pool-name="derby_net_Vaali-Db_aPool"/>
 </resources>
