@@ -1,10 +1,12 @@
 package vaalikone;
 
-
+import java.util.List;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import static javax.persistence.Persistence.createEntityManagerFactory;
+import javax.persistence.Query;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -13,7 +15,6 @@ import javax.servlet.ServletContextListener;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  * Web application lifecycle listener.
  *
@@ -27,11 +28,22 @@ public class ServletListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        
+
         EntityManagerFactory emf =
-            createEntityManagerFactory("Vaalikone5PU");
+                createEntityManagerFactory("Vaalikone5PU");
         sce.getServletContext().setAttribute("emf", emf);
-        
+
+        try{
+        EntityManager em = emf.createEntityManager();
+        Query qK = em.createNamedQuery("Kysymykset.findAll");
+        Query qT = em.createNamedQuery("Ehdokkaat.findAll");
+        List ehdokasLista = qT.getResultList();
+        List kysymysLista = qK.getResultList();
+        int kysymystenMaara = kysymysLista.size() + 1;
+        sce.getServletContext().setAttribute("maara", kysymystenMaara);
+        }catch(Exception e){}
+
+
         Loki.init();
 
     }
@@ -43,8 +55,11 @@ public class ServletListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         EntityManagerFactory emf =
-            (EntityManagerFactory)sce.getServletContext().getAttribute("emf");
+                (EntityManagerFactory) sce.getServletContext().getAttribute("emf");
         emf.close();
     }
-    
+
+    private Object getServletContext() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

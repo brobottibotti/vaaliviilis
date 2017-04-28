@@ -19,17 +19,18 @@ import java.util.logging.Logger;
  */
 public class Kayttaja implements Serializable {
 
-    private final List<Integer> vastaus = new ArrayList<>(20);
-    List<Tuple<Integer, Integer>> pisteet = new ArrayList<>(20);
+    private final List<Integer> vastaus;
+    List<Tuple<Integer, Integer>> pisteet;
     private final static Logger logger = Logger.getLogger(Loki.class.getName());
 
     /**
      * Kayttaja-olioon tallennetaan vaalikoneen käyttäjän tietoja.
      */
-    public Kayttaja() {
-
+    public Kayttaja(int vastaustenMaara) {
+        vastaus = new ArrayList<>(vastaustenMaara);
+        pisteet = new ArrayList<>(vastaustenMaara);
         //täytelläänhän listat valmiiksi
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i <= vastaustenMaara; i++) {
             this.vastaus.add(0);
             this.pisteet.add(new Tuple<>(0, 0));
         }

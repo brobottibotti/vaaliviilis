@@ -23,13 +23,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jonne
  */
 @Entity
-@Table(name = "KYSYMYKSET", schema="APP")
+@Table(name = "KYSYMYKSET", schema = "APP")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Kysymykset.findAll", query = "SELECT k FROM Kysymykset k"),
+    @NamedQuery(name = "Kysymykset.findSorted", query = "SELECT k FROM Kysymykset k ORDER BY k.kysymysId ASC"),
     @NamedQuery(name = "Kysymykset.findByKysymysId", query = "SELECT k FROM Kysymykset k WHERE k.kysymysId = :kysymysId"),
     @NamedQuery(name = "Kysymykset.findByKysymys", query = "SELECT k FROM Kysymykset k WHERE k.kysymys = :kysymys")})
 public class Kysymykset implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -108,5 +110,4 @@ public class Kysymykset implements Serializable {
         return "persist.Kysymykset[ kysymysId=" + kysymysId + " ]";
     }
     private static final Logger LOG = Logger.getLogger(Kysymykset.class.getName());
-    
 }

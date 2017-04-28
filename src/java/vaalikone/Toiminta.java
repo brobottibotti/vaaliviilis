@@ -42,6 +42,8 @@ public class Toiminta extends HttpServlet {
     private String kysymys = "0";
     private String ehdokastila;
     private String LisaaEME;
+    public int kysymystenMaara;
+    public int ehdokkaidenMaara;
 
     /**
      * Processes requests for both HTTP
@@ -55,8 +57,10 @@ public class Toiminta extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
         
+
+        response.setContentType("text/html;charset=UTF-8");
+
     }
 
     public void kysymysPoistaminen(int p) {
@@ -81,19 +85,19 @@ public class Toiminta extends HttpServlet {
         EntityManager em = manageri();
         em.getTransaction().begin();
         Kysymykset kysymykset = new Kysymykset();
-        kysymykset.setKysymysId(o + 1);
+        kysymykset.setKysymysId(o);
         kysymykset.setKysymys(k);
         em.merge(kysymykset);
         em.getTransaction().commit();
 
     }
-    public EntityManager manageri(){
-            EntityManagerFactory emf
-                = (EntityManagerFactory) getServletContext().getAttribute("emf");
+
+    public EntityManager manageri() {
+        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
         return em;
     }
-    
+
     public String kryptaa(String str) {
         if (str == null || str.length() == 0) {
             throw new IllegalArgumentException("String to encript cannot be null or zero length");
@@ -119,9 +123,8 @@ public class Toiminta extends HttpServlet {
         }
         return "";
     }
-    
 
-    public void lisaaEhdokas(int id, String s, String e, String p, String k, int ik, String mahe, String a, String me){
+    public void lisaaEhdokas(int id, String s, String e, String p, String k, int ik, String mahe, String a, String me) {
         EntityManager em = manageri();
         em.getTransaction().begin();
         Query t = em.createQuery("SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
@@ -154,7 +157,7 @@ public class Toiminta extends HttpServlet {
             uusiEhdokas.setMiksiEduskuntaan(me);
             em.merge(uusiEhdokas);
             ehdokastila = "eMsuccess";
-            
+
         }
         em.getTransaction().commit();
 
@@ -191,23 +194,28 @@ public class Toiminta extends HttpServlet {
         processRequest(request, response);
         HttpSession session = request.getSession(true);
         EntityManager em = manageri();
-        
-        Query qT = em.createNamedQuery("Ehdokkaat.findAll");
-        Query qK = em.createNamedQuery("Kysymykset.findAll");
-        List ehdokasLista = qT.getResultList();
-        List kysymysLista = qK.getResultList();
-        session.setAttribute("eLista", ehdokasLista);
-        session.setAttribute("kLista", kysymysLista);
 
+
+        Query qL = em.createQuery("SELECT k.kysymysId FROM Kysymykset k");
+        List kysymykset = qL.getResultList();
+        
         if (request.getParameter("kPNappi") != null) {
             poistaK = Integer.parseInt(request.getParameter("poistaK"));
             kysymysPoistaminen(poistaK);
             response.sendRedirect("Admin?ADD=kPsuccess");
         }
         if (request.getParameter("kLNappi") != null) {
-
+            int koko;
+            for (int i = 1; true; i++) {
+                logger.log(Level.INFO, "i arvo: {0}", new Object[]{i});
+                if (!kysymykset.contains(i)) {
+                    koko = i;
+                    logger.log(Level.INFO, "koko arvo: {0}", new Object[]{koko});
+                    break;
+                }
+            }
             kysymys = request.getParameter("kysymys");
-            lisaaKysymys(kysymys, kysymysLista.size());
+            lisaaKysymys(kysymys, koko);
             request.setAttribute("kLNappi", "testi");
             logger.log(Level.INFO, "eID: {0}", new Object[]{request.getParameter("kLNappi")});
             response.sendRedirect("Admin?ADD=kLsuccess");
@@ -232,7 +240,7 @@ public class Toiminta extends HttpServlet {
             LisaaEA = request.getParameter("LisaaEA");
             logger.log(Level.INFO, "ES: {0} / EE: {1} / EP: {2} / EK: {3} / EI: {4} / MAHE: {5} / EA: {6}", new Object[]{LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA});
             lisaaEhdokas(LisaaEId, LisaaES, LisaaEE, LisaaEP, LisaaEK, LisaaEI, LisaaMAHE, LisaaEA, LisaaEME);
-            response.sendRedirect("Admin?ADD="+ehdokastila);
+            response.sendRedirect("Admin?ADD=" + ehdokastila);
 
         }
     }

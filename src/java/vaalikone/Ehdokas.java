@@ -16,6 +16,7 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,9 +47,11 @@ public class Ehdokas extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
+        int kysymystenMaara = 23;
+        
         int kysymys_id;
-
+        RequestDispatcher loppusivu = request.getRequestDispatcher("ehdokas-loppusivu.jsp");
+        
         // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
         HttpSession session = request.getSession(true);
 
@@ -57,7 +60,7 @@ public class Ehdokas extends HttpServlet {
 
         //jos käyttäjä-oliota ei löydy sessiosta, luodaan sinne sellainen
         if (usr == null) {
-            usr = new Kayttaja();
+            usr = new Kayttaja(kysymystenMaara);
             logger.log(Level.FINE, "Luotu uusi käyttäjä-olio");
             session.setAttribute("usrobj", usr);
         }
@@ -71,6 +74,7 @@ public class Ehdokas extends HttpServlet {
         //Jos ei määritelty, esitetään kysymyksiä.
 
         String strFunc = session.getAttribute("func").toString();
+        Ehdokkaat ehdokas = (Ehdokkaat) session.getAttribute("ehdokas");
         if (strFunc == "Ehdokas") {
 
             //hae parametrinä tuotu edellisen kysymyksen nro
@@ -81,6 +85,7 @@ public class Ehdokas extends HttpServlet {
 
             // Jos kysymyksen numero (kysId) on asetettu, haetaan tuo kysymys
             // muuten haetaan kysnro 1
+
             if (strKysymys_id == null) {
                 kysymys_id = 1;
             } else {
@@ -89,7 +94,7 @@ public class Ehdokas extends HttpServlet {
                 if (strVastaus != null) {
                     usr.addVastaus(kysymys_id, parseInt(strVastaus));
                 }
-                Ehdokkaat ehdokas = (Ehdokkaat) session.getAttribute("ehdokas");
+                //Ehdokkaat ehdokas = (Ehdokkaat) session.getAttribute("ehdokas");
                 Vastaukset vastaukset = new Vastaukset(ehdokas.getEhdokasId(), kysymys_id);
                 Query t = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1 AND v.vastauksetPK.kysymysId=?2");
                 t.setParameter(1, ehdokas.getEhdokasId());
@@ -104,24 +109,30 @@ public class Ehdokas extends HttpServlet {
                         vastaukset.setKommentti(request.getParameter("kommentti"));
                         em.persist(vastaukset);
                         em.getTransaction().commit();
+                        String paskaString = Integer.toString(kysymys_id);
+                logger.log(Level.INFO, paskaString);
                     } else {
                         em.getTransaction().begin();
                         vastaukset.setKommentti(request.getParameter("kommentti"));
                         vastaukset.setVastaus(parseInt(strVastaus));
                         em.merge(vastaukset);
                         em.getTransaction().commit();
+                        String paskaString = Integer.toString(kysymys_id);
+                logger.log(Level.INFO, paskaString);
                     }
                     
                 } catch (Exception e) {
                     logger.log(Level.INFO, "Vastaus arvon testaus: {0}", new Object[]{strVastaus});
 
                 }
+                String paskaString = Integer.toString(kysymys_id);
+                logger.log(Level.INFO, paskaString);
                 //määritä seuraavaksi haettava kysymys
                 kysymys_id++;
             }
 
             //jos kysymyksiä on vielä jäljellä, hae seuraava
-            if (kysymys_id < 20) {
+            if (kysymys_id < kysymystenMaara) {
                 try {
 
 
@@ -148,7 +159,7 @@ public class Ehdokas extends HttpServlet {
             } else {
 
                 //Tyhjennetään piste-array jotta pisteet eivät tuplaannu mahdollisen refreshin tapahtuessa
-                for (int i = 0; i < 20; i++) {
+                for (int i = 0; i < kysymystenMaara; i++) {
                     usr.pisteet.set(i, new Tuple<>(0, 0));
                 }
 
@@ -179,13 +190,23 @@ public class Ehdokas extends HttpServlet {
                         logger.log(Level.INFO, "eID: {0} / k: {1} / kV: {2} / eV: {3} / p: {4}", new Object[]{i, eVastaus.getVastauksetPK().getKysymysId(), usr.getVastaus(i), eVastaus.getVastaus(), pisteet});
                         usr.addPisteet(i, pisteet);
                     }
-
+                    
                 }
+                
             }
-
+                Query qk = em.createQuery("SELECT k FROM Kysymykset k");
+                Query qv = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1");
+                qv.setParameter(1, ehdokas.getEhdokasId());
+                Query qe = em.createQuery("SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
+                qe.setParameter(1, ehdokas.getEhdokasId());                       
+                List<Vastaukset> vastausList = qv.getResultList();
+                List<Kysymykset> kysymysList = qk.getResultList();
+                List<Ehdokkaat> ehdokasList = qe.getResultList();
+                request.setAttribute("vastaukset", vastausList);
+                request.setAttribute("kysymykset", kysymysList);
+                request.setAttribute("ehdokas", ehdokasList);
+                loppusivu.forward(request, response);
         }
-
-
     }
 
     private Integer laskePisteet(Integer kVastaus, Integer eVastaus) {

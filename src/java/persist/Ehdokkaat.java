@@ -23,10 +23,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jonne
  */
 @Entity
-@Table(name = "EHDOKKAAT", schema="APP")
+@Table(name = "EHDOKKAAT", schema = "APP")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Ehdokkaat.findAll", query = "SELECT e FROM Ehdokkaat e"),
+    @NamedQuery(name = "Ehdokkaat.findSorted", query = "SELECT e FROM Ehdokkaat e ORDER BY e.ehdokasId ASC"),
     @NamedQuery(name = "Ehdokkaat.findByEhdokasId", query = "SELECT e FROM Ehdokkaat e WHERE e.ehdokasId = :ehdokasId"),
     @NamedQuery(name = "Ehdokkaat.findBySukunimi", query = "SELECT e FROM Ehdokkaat e WHERE e.sukunimi = :sukunimi"),
     @NamedQuery(name = "Ehdokkaat.findByEtunimi", query = "SELECT e FROM Ehdokkaat e WHERE e.etunimi = :etunimi"),
@@ -39,6 +40,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Ehdokkaat.findByKayttajatunnus", query = "SELECT e FROM Ehdokkaat e WHERE e.kayttajatunnus = :kayttajatunnus"),
     @NamedQuery(name = "Ehdokkaat.findBySalasana", query = "SELECT e FROM Ehdokkaat e WHERE e.salasana = :salasana")})
 public class Ehdokkaat implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -76,6 +78,7 @@ public class Ehdokkaat implements Serializable {
     @NotNull
     @Column(name = "SALASANA")
     private String salasana;
+
     /**
      *
      */
@@ -233,20 +236,20 @@ public class Ehdokkaat implements Serializable {
     public void setAmmatti(String ammatti) {
         this.ammatti = ammatti;
     }
-    
-        public String getKayttajatunnus(){
+
+    public String getKayttajatunnus() {
         return kayttajatunnus;
     }
-    
-    public void setKayttajatunnus(String kayttajatunnus){
+
+    public void setKayttajatunnus(String kayttajatunnus) {
         this.kayttajatunnus = kayttajatunnus;
     }
-    
-    public String getSalasana(){
+
+    public String getSalasana() {
         return salasana;
     }
-    
-    public void setSalasana(String salasana){
+
+    public void setSalasana(String salasana) {
         this.salasana = salasana;
     }
 
@@ -272,5 +275,4 @@ public class Ehdokkaat implements Serializable {
         return "persist.Ehdokkaat[ ehdokasId=" + ehdokasId + " ]";
     }
     private static final Logger LOG = Logger.getLogger(Ehdokkaat.class.getName());
-    
 }
