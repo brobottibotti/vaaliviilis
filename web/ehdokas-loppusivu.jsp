@@ -17,21 +17,32 @@
     </head>
     <body>
         <div id="container">
-        <h1>Alla näet vastauksesi</h1>
+        <img id="headerimg" src="Logo.png" width="720" />
+        <br><br>
+        <h3>Omat tiedot</h3>
         <%
+            List <Ehdokkaat> ehdokas = (List<Ehdokkaat>) request.getAttribute("ehdokas");
             List <Kysymykset> kysymykset = (List<Kysymykset>) request.getAttribute("kysymykset");
             List <Vastaukset> vastaukset = (List<Vastaukset>) request.getAttribute("vastaukset");
         %>
-        <br>
-            <% 
-            for (int i = 0; i < vastaukset.size(); i++) {
-                %>
-                <b>Kysymys <%= i + 1%>: <%= kysymykset.get(i).getKysymys()%></b>
-                <br>
-                Vastauksesi: <%=vastaukset.get(i).getVastaus()%>
-                <br><br>
-            <% }
-            %>
+            <% for (Ehdokkaat tiedot : ehdokas) { %>
+                <b>Etunimi:</b> <%=tiedot.getEtunimi()%><br>
+                <b>Sukunimi:</b> <%=tiedot.getSukunimi()%><br>
+                <b>Ikä:</b> <%=tiedot.getIkä()%><br>
+                <b>Ammatti:</b> <%=tiedot.getAmmatti()%><br>
+                <b>Puolue:</b> <%=tiedot.getPuolue()%><br>
+                <b>Kotipaikkakunta:</b> <%=tiedot.getKotipaikkakunta()%><br>
+                <b>Miksi haluan eduskuntaan:</b> <%=tiedot.getMiksiEduskuntaan()%><br>
+                <b>Mitä asioita haluaisin edistää:</b> <%=tiedot.getMitaAsioitaHaluatEdistaa()%><br><br>
+            <% } %>
+            
+            <h2>Alla näet vastauksesi</h2>
+            <% for (int i = 0; i < vastaukset.size(); i++) { %>
+                <b>Kysymys <%= i + 1%>: <%=kysymykset.get(i).getKysymys()%></b><br>
+                Vastauksesi: <%=vastaukset.get(i).getVastaus()%><br>
+                Kommenttisi: <%=vastaukset.get(i).getKommentti()%><br><br>
+            <% } %>
+            <div class="kysymys"><small>1=Täysin eri mieltä 2=Osittain eri mieltä 3=En osaa sanoa, 4=Osittain samaa mieltä 5=Täysin samaa mieltä</small>
         </div>
     </body>
 </html>

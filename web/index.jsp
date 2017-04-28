@@ -10,7 +10,7 @@
     </head>
     <body>
         <div id="container">
-            <img id="headerimg" src="Logo.png" width="720" />
+        <img id="headerimg" src="images/Logo.png" width="500" height="144" alt=""/>
             <div class ="kirjautuminen">
                 <h1>Ehdokas login</h1>
                 <form action="Kirjautuminen" method="POST">

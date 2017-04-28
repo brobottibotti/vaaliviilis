@@ -200,10 +200,16 @@ public class Ehdokas extends HttpServlet {
                         "SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1");
                 qv.setParameter(1, ehdokas.getEhdokasId());
 
+                Query qe = em.createQuery(
+                        "SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
+                qe.setParameter(1, ehdokas.getEhdokasId());
+                        
                 List<Vastaukset> vastausList = qv.getResultList();
                 List<Kysymykset> kysymysList = qk.getResultList();
+                List<Ehdokkaat> ehdokasList = qe.getResultList();
                 request.setAttribute("vastaukset", vastausList);
                 request.setAttribute("kysymykset", kysymysList);
+                request.setAttribute("ehdokas", ehdokasList);
                 loppusivu.forward(request, response);
         }
     }
