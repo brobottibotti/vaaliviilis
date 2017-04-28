@@ -39,6 +39,7 @@ public class Kirjautuminen extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+        
     
     public String crypt(String str) {
         if (str == null || str.length() == 0) {

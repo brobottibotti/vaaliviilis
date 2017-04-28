@@ -193,17 +193,11 @@ public class Ehdokas extends HttpServlet {
                 }
                 
             }
-                Query qk = em.createQuery(
-                "SELECT k FROM Kysymykset k");
-
-                Query qv = em.createQuery(
-                        "SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1");
+                Query qk = em.createQuery("SELECT k FROM Kysymykset k");
+                Query qv = em.createQuery("SELECT v FROM Vastaukset v WHERE v.vastauksetPK.ehdokasId=?1");
                 qv.setParameter(1, ehdokas.getEhdokasId());
-
-                Query qe = em.createQuery(
-                        "SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
-                qe.setParameter(1, ehdokas.getEhdokasId());
-                        
+                Query qe = em.createQuery("SELECT e FROM Ehdokkaat e WHERE e.ehdokasId=?1");
+                qe.setParameter(1, ehdokas.getEhdokasId());                       
                 List<Vastaukset> vastausList = qv.getResultList();
                 List<Kysymykset> kysymysList = qk.getResultList();
                 List<Ehdokkaat> ehdokasList = qe.getResultList();
