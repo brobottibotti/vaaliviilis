@@ -44,7 +44,6 @@ public class Toiminta extends HttpServlet {
     private String LisaaEME;
     public int kysymystenMaara;
     public int ehdokkaidenMaara;
-
     /**
      * Processes requests for both HTTP
      * <code>GET</code> and
@@ -55,9 +54,12 @@ public class Toiminta extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    Kirjautuminen_admin akirjaus;
+
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
 
         response.setContentType("text/html;charset=UTF-8");
 
@@ -192,13 +194,12 @@ public class Toiminta extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
-        HttpSession session = request.getSession(true);
         EntityManager em = manageri();
 
 
         Query qL = em.createQuery("SELECT k.kysymysId FROM Kysymykset k");
         List kysymykset = qL.getResultList();
-        
+
         if (request.getParameter("kPNappi") != null) {
             poistaK = Integer.parseInt(request.getParameter("poistaK"));
             kysymysPoistaminen(poistaK);

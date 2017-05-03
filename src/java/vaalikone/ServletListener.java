@@ -32,8 +32,9 @@ public class ServletListener implements ServletContextListener {
         EntityManagerFactory emf =
                 createEntityManagerFactory("Vaalikone5PU");
         sce.getServletContext().setAttribute("emf", emf);
-
+        Toiminta toiminta = new Toiminta();
         try{
+        sce.getServletContext().setAttribute("toiminta", toiminta);
         EntityManager em = emf.createEntityManager();
         Query qK = em.createNamedQuery("Kysymykset.findAll");
         Query qT = em.createNamedQuery("Ehdokkaat.findAll");

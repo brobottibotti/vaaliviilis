@@ -25,9 +25,10 @@
             <%
                 @SuppressWarnings("unchecked")
                 List<Kysymykset> kysymykset = (List<Kysymykset>) request.getAttribute("kysymykset");
+                int kysymystenMaara = Integer.parseInt(session.getAttribute("kyssariKoko").toString());
      for (Kysymykset kysymys : kysymykset) {%>
             <div class="kysymys">
-                <%= kysymys.getKysymysId()%> / 19 <br>
+                <%= kysymys.getKysymysId()%> / <%=kysymystenMaara %> <br>
                 <%= kysymys.getKysymys()%>
             </div>
             <form action="Vaalikone" id="vastausformi">

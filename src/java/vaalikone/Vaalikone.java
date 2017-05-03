@@ -46,20 +46,22 @@ public class Vaalikone extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
+        // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
+        HttpSession session = request.getSession(true);
+        
         EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
         Query qK = em.createNamedQuery("Kysymykset.findSorted");
         List kysymysLista = qK.getResultList();
         int kysymystenMaara = kysymysLista.size();
+        session.setAttribute("kyssariKoko", kysymystenMaara);
 
 
         logger.log(Level.INFO, "ehdokkaidenmaara: {0} / kysymystenmaara: {1}", new Object[]{kysymystenMaara});
 
         int kysymys_id;
 
-        // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
-        HttpSession session = request.getSession(true);
+
 
         //hae käyttäjä-olio http-sessiosta
         Kayttaja usr = (Kayttaja) session.getAttribute("usrobj");
@@ -197,8 +199,7 @@ public class Vaalikone extends HttpServlet {
             List<Vastaukset> parhaanEhdokkaanVastaukset = q.getResultList();
 
             //hae kaikki kysymykset
-            q = em.createQuery(
-                    "SELECT k FROM Kysymykset k");
+            q = em.createNamedQuery("Kysymykset.findSorted");
             List<Kysymykset> kaikkiKysymykset = q.getResultList();
 
             //ohjaa tiedot tulosten esityssivulle

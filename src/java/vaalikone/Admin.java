@@ -49,34 +49,35 @@ public class Admin extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-
-        logger.log(Level.FINE, "Luotu uusi käyttäjä-olio");
-
-        EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
-        EntityManager em = emf.createEntityManager();
-
         HttpSession session = request.getSession(true);
+        if (session.getAttribute("func").equals("adminit")) {
+            PrintWriter out = response.getWriter();
 
-        request.getRequestDispatcher("/admin.jsp")
-                .forward(request, response);
+            logger.log(Level.FINE, "Luotu uusi käyttäjä-olio");
 
-        Query qK = em.createNamedQuery("Kysymykset.findSorted");
-        Query qT = em.createNamedQuery("Ehdokkaat.findSorted");
-        List ehdokasLista = qT.getResultList();
-        List kysymysLista = qK.getResultList();
-        session.setAttribute("eLista", ehdokasLista);
-        session.setAttribute("kLista", kysymysLista);
-        logger.log(Level.INFO, "eID: {0}", new Object[]{kysymysLista.size()});
+            EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
+            EntityManager em = emf.createEntityManager();
 
 
+            request.getRequestDispatcher("/admin.jsp")
+                    .forward(request, response);
+
+            Query qK = em.createNamedQuery("Kysymykset.findSorted");
+            Query qT = em.createNamedQuery("Ehdokkaat.findSorted");
+            List ehdokasLista = qT.getResultList();
+            List kysymysLista = qK.getResultList();
+            session.setAttribute("eLista", ehdokasLista);
+            session.setAttribute("kLista", kysymysLista);
+            logger.log(Level.INFO, "eID: {0}", new Object[]{kysymysLista.size()});
+
+        }
 
     }
-
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -92,12 +93,7 @@ public class Admin extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
-        
-        if(request.getParameter("ADD").equals("kLsuccess")){
-                PrintWriter out = response.getWriter();
 
-            
-        }
     }
 
     /**
