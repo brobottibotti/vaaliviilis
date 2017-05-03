@@ -18,7 +18,7 @@
         <div id="container">
 
             <img id="headerimg" src="Logo.png" width="720" />
-            <div class ="kirjautuminen">
+            <div class ="kirjautuminen_a">
                 <h1>Administrator</h1>
                 <form action="Kirjautuminen_admin" method="POST">
                     Tunnus:<br>
