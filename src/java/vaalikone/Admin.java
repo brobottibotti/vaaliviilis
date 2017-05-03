@@ -21,23 +21,12 @@ import persist.Ehdokkaat;
 import persist.Kysymykset;
 
 /**
- *
+ * Kutsutaan admin JSP:tä. Toimii välipalikkana admin JSP:n ja toiminta servletin välillä
  * @author tomi1404
  */
 public class Admin extends HttpServlet {
 
     private final static Logger logger = Logger.getLogger(Loki.class.getName());
-    int poistaK = 0;
-    int poistaE = 0;
-    int LisaaEId = 0;
-    String LisaaES;
-    String LisaaEE;
-    String LisaaEP;
-    String LisaaEK;
-    int LisaaEI;
-    String LisaaMAHE;
-    String LisaaEA;
-    String kysymys = "0";
 
     /**
      * Processes requests for both HTTP

@@ -12,7 +12,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /**
- *
+ * Luokka pitää sisällään loki tiedostojen tallentamiseen tarvittavat tiedot. 
+ * Varsinaisen loki-tulostuksen hoitaa javan oma logger.
  * @author Jonne
  */
 public class Loki {

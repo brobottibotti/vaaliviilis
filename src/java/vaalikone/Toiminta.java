@@ -23,7 +23,7 @@ import persist.Ehdokkaat;
 import persist.Kysymykset;
 
 /**
- *
+ * Suorittaa Admin.jsp:n lähettämät toiminnot ja uudelleen ohjaa selaimen takaisin Admin.java servlettiin.
  * @author tomi1404
  */
 public class Toiminta extends HttpServlet {
@@ -64,7 +64,11 @@ public class Toiminta extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
     }
-
+/**
+ * Poistaa kysymykset
+ * @param p 
+ * Poistettavan kysymyksen ID
+ */
     public void kysymysPoistaminen(int p) {
         EntityManager em = manageri();
         em.getTransaction().begin();
@@ -72,7 +76,11 @@ public class Toiminta extends HttpServlet {
         em.remove(poistettavaK);
         em.getTransaction().commit();
     }
-
+/**
+ * Poistaa ehdokkaan
+ * @param e 
+ * Numero jolla etsitään poistettavan ehdokkaan entity ja poistetaan se
+ */
     public void ehdokasPoistaminen(int e) {
         EntityManager em = manageri();
         em.getTransaction().begin();
@@ -82,7 +90,13 @@ public class Toiminta extends HttpServlet {
         logger.log(Level.INFO, "eID: {0}", new Object[]{e});
 
     }
-
+/**
+ * Lisätään kysymyksiä
+ * @param k
+ * Kysymys string muodossa
+ * @param o 
+ * Kysymyksen ID
+ */
     public void lisaaKysymys(String k, int o) {
         EntityManager em = manageri();
         em.getTransaction().begin();
@@ -93,13 +107,22 @@ public class Toiminta extends HttpServlet {
         em.getTransaction().commit();
 
     }
-
+/**
+ * Entitymanager -metodi
+ * @return 
+ */
     public EntityManager manageri() {
         EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
         return em;
     }
-
+/**
+ * Kirjautumisessa käytettävä kryptauskoodi
+ * @param str
+ * Kryptattava arvo
+ * @return 
+ * Palauttaa MD5-kryptatun stringin
+ */
     public String kryptaa(String str) {
         if (str == null || str.length() == 0) {
             throw new IllegalArgumentException("String to encript cannot be null or zero length");
@@ -125,7 +148,27 @@ public class Toiminta extends HttpServlet {
         }
         return "";
     }
-
+/**
+ * Lisää uuden ehdokkaan tai muokkaa olemassaolevaa ehdokasta
+ * @param id
+ * Ehdokkaan ID
+ * @param s
+ * Sukunimi
+ * @param e
+ * Etunimi
+ * @param p
+ * Puolue
+ * @param k
+ * Kotipaikkakunta
+ * @param ik
+ * Ikä
+ * @param mahe
+ * Mitä asisoita haluat edistää
+ * @param a
+ * Ammatti
+ * @param me
+ * Miksi eduskuntaan
+ */
     public void lisaaEhdokas(int id, String s, String e, String p, String k, int ik, String mahe, String a, String me) {
         EntityManager em = manageri();
         em.getTransaction().begin();
@@ -182,9 +225,9 @@ public class Toiminta extends HttpServlet {
     }
 
     /**
+     * Admin JSP:n lähettämän tiedon käsittelylogiikka
      * Handles the HTTP
      * <code>POST</code> method.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs

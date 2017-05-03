@@ -30,16 +30,15 @@ public class Kirjautuminen_admin extends HttpServlet {
 
     private final static Logger logger = Logger.getLogger(Loki.class.getName());
     /**
+     * Sama kuin ehdokas-kirjautuminen mutta järjestelmänvalvojille, jotka ohjataan hallintosivulle josta voi lisätä ja poistaa ehdokkaita ja kysymyksiä.
      * Processes requests for both HTTP
      * <code>GET</code> and
      * <code>POST</code> methods.
-     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,7 +49,7 @@ public class Kirjautuminen_admin extends HttpServlet {
     /**
      * Handles the HTTP
      * <code>GET</code> method.
-     *
+     * 
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs

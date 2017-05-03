@@ -27,7 +27,9 @@ import persist.Kysymykset;
 import persist.Vastaukset;
 
 /**
- *
+ * Toiminnaltaan samanlainen  kuin Vaalikone mutta normaalin toiminnan lisäksi 
+ * Ehdokas myös suorittaa Ehdokkaiden vastausten tallentamisen. 
+ * Kutsuu myös tallennus.jsp tiedostoa
  * @author tomi1404
  */
 public class Ehdokas extends HttpServlet {

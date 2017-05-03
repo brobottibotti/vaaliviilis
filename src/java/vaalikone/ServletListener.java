@@ -16,7 +16,7 @@ import javax.servlet.ServletContextListener;
  * and open the template in the editor.
  */
 /**
- * Web application lifecycle listener.
+ * Ohjelman listener luokka, jossa alustetaan Entitymanageri ja asetetaan se servlet contextiin
  *
  * @author Jonne
  */

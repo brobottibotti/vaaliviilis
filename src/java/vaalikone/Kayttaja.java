@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Käyttäjä java tiedostossa on alkuperäisestä koodista muutettu vain pari "kovakoodattua" arvoa parametreiksi
  * @author Jonne
  */
 public class Kayttaja implements Serializable {
