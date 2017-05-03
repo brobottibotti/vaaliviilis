@@ -48,16 +48,20 @@ public class Vaalikone extends HttpServlet {
 
         // hae http-sessio ja luo uusi jos vanhaa ei ole vielä olemassa
         HttpSession session = request.getSession(true);
-        
+
         EntityManagerFactory emf = (EntityManagerFactory) getServletContext().getAttribute("emf");
         EntityManager em = emf.createEntityManager();
         Query qK = em.createNamedQuery("Kysymykset.findSorted");
+        Query qO = em.createNamedQuery("Ehdokkaat.findSorted");
         List kysymysLista = qK.getResultList();
+        List ehdokasLista = qO.getResultList();
         int kysymystenMaara = kysymysLista.size();
+        int ehdokasMaara = ehdokasLista.size();
+        session.setAttribute("ehdokasKoko", ehdokasMaara);
         session.setAttribute("kyssariKoko", kysymystenMaara);
 
-
-        logger.log(Level.INFO, "ehdokkaidenmaara: {0} / kysymystenmaara: {1}", new Object[]{kysymystenMaara});
+        logger.log(Level.INFO, "ehdokkaidenmaara: {0}", new Object[]{ehdokasMaara});
+        logger.log(Level.INFO, "kysymystenmaara: {0}", new Object[]{kysymystenMaara});
 
         int kysymys_id;
 
@@ -134,7 +138,7 @@ public class Vaalikone extends HttpServlet {
             } else {
 
                 //Tyhjennetään piste-array jotta pisteet eivät tuplaannu mahdollisen refreshin tapahtuessa
-                for (int i = 0; i <= kysymystenMaara; i++) {
+                for (int i = 0; i < ehdokasMaara; i++) {
                     usr.pisteet.set(i, new Tuple<>(0, 0));
                 }
 
@@ -144,7 +148,7 @@ public class Vaalikone extends HttpServlet {
                 List<Integer> ehdokasList = qE.getResultList();
 
                 //iteroi ehdokaslista läpi
-                for (int i = 1; i < ehdokasList.size(); i++) {
+                for (int i = 1; i < ehdokasList.size()+1; i++) {
 
                     //Hae lista ehdokkaiden vastauksista
                     Query qV = em.createQuery(
@@ -185,6 +189,7 @@ public class Vaalikone extends HttpServlet {
 
             //Lue käyttäjälle sopivimmat ehdokkaat väliaikaiseen Tuple-listaan.
             List<Tuple<Integer, Integer>> tpl = usr.haeParhaatEhdokkaat();
+            logger.log(Level.INFO, "tpl kyssariid: {0}", new Object[]{tpl.get(19).ehdokasId});
 
             //hae määritetyn ehdokkaan tiedot
             Query q = em.createQuery(

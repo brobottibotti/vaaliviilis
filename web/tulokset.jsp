@@ -24,14 +24,16 @@
                 List<Integer> kayttajanVastaukset = (List<Integer>) request.getAttribute("kayttajanVastaukset");
                 List<Vastaukset> parhaanEhdokkaanVastaukset = (List<Vastaukset>) request.getAttribute("parhaanEhdokkaanVastaukset");
                 List<Kysymykset> kaikkiKysymykset = (List<Kysymykset>) request.getAttribute("kaikkiKysymykset");
+                int kysymystenMaara = Integer.parseInt(session.getAttribute("kyssariKoko").toString());
+                int ehdokasMaara = Integer.parseInt(session.getAttribute("ehdokasKoko").toString());
                 Double pisteet = (double) (Integer) request.getAttribute("pisteet");
-                Double prosentit = (double) Math.round(pisteet / (3 * 19) * 100);
+                Double prosentit = (double) Math.round(pisteet / (3 * kysymystenMaara) * 100);
                 Integer jarjestysnumero = (Integer) request.getAttribute("jarjestysnumero");
 
                 if (jarjestysnumero > 0) {%>
             <a href="Vaalikone?func=haeEhdokas&numero=<%= jarjestysnumero - 1%>">Edellinen ehdokas</a>&nbsp; 
             <% }
-                if (jarjestysnumero < 18) {%>
+                if (jarjestysnumero < ehdokasMaara-1) {%>
             <a href="Vaalikone?func=haeEhdokas&numero=<%= jarjestysnumero + 1%>">Seuraavaksi paras ehdokas</a>
             <% }
 
