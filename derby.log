@@ -1,15 +1,15 @@
-Wed May 03 14:55:06 EEST 2017 : Apache Derby Network Server - 10.9.1.0 - (1344872) started and ready to accept connections on port 1527
+Thu May 04 09:37:18 EEST 2017 : Apache Derby Network Server - 10.9.1.0 - (1344872) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Wed May 03 14:55:06 EEST 2017:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-015b-ce29-eec8-000028da7478 
-on database directory P:\Java\Vaalikone\Master\Vaali-Db  with class loader sun.misc.Launcher$AppClassLoader@31f39c59 
+Thu May 04 09:37:18 EEST 2017:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.9.1.0 - (1344872): instance a816c00e-015b-d22d-5755-000028da7478 
+on database directory P:\Java\Vaalikone\Master\Vaali-Db  with class loader sun.misc.Launcher$AppClassLoader@1174ec5 
 Loaded from file:/C:/Program%20Files/glassfish-4.0/javadb/lib/derby.jar
 java.vendor=Oracle Corporation
-java.runtime.version=1.7.0_21-b11
+java.runtime.version=1.7.0_45-b18
 user.dir=C:\Program Files\glassfish-4.0\javadb
 derby.system.home=P:\Java\Vaalikone\Master
 Database Class Loader started - derby.database.classpath=''
-Wed May 03 14:55:07 EEST 2017 Thread[DRDAConnThread_3,5,main] (XID = 16935), (SESSIONID = 0), (DATABASE = Vaali-Db), (DRDAID = {1}), Cleanup action starting
+Thu May 04 09:37:21 EEST 2017 Thread[DRDAConnThread_3,5,main] (XID = 17182), (SESSIONID = 0), (DATABASE = Vaali-Db), (DRDAID = {1}), Cleanup action starting
 java.sql.SQLNonTransientConnectionException: Connection authentication failure occurred.  Reason: Invalid authentication..
 	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
 	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
@@ -59,4 +59,9 @@ java.sql.SQLException: Connection authentication failure occurred.  Reason: Inva
 	at org.apache.derby.impl.drda.DRDAConnThread.run(Unknown Source)
 ============= end nested exception, level (1) ===========
 Cleanup action completed
-Wed May 03 14:55:07 EEST 2017 Thread[DRDAConnThread_3,5,main] (DATABASE = Vaali-Db), (DRDAID = {1}), Connection authentication failure occurred.  Reason: Invalid authentication..
+Thu May 04 09:37:21 EEST 2017 Thread[DRDAConnThread_3,5,main] (DATABASE = Vaali-Db), (DRDAID = {1}), Connection authentication failure occurred.  Reason: Invalid authentication..
+----------------------------------------------------------------
+Thu May 04 10:28:00 EEST 2017: Shutting down Derby engine
+----------------------------------------------------------------
+Thu May 04 10:28:00 EEST 2017:
+Shutting down instance a816c00e-015b-d22d-5755-000028da7478 on database directory P:\Java\Vaalikone\Master\Vaali-Db with class loader sun.misc.Launcher$AppClassLoader@1174ec5 

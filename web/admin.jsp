@@ -27,7 +27,7 @@
 
 
 
-        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST">
             Poistettavan kysymyksen id:<br>
             <input type="number" name="poistaK">
             <br>
@@ -42,7 +42,7 @@
 
 
 
-        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST">
             Lisättävä Kysymys:<br>
             <input type="text" name="kysymys" required>
             <br>
@@ -64,7 +64,7 @@
         </c:forEach>
 
 
-        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST">
             Poistettavan ehdokkaan ID:<br>
             <input type="number" name="poistaE" required>
             <br>
@@ -78,7 +78,7 @@
         </c:choose>
 
 
-        <form action="Toiminta" method="POST" onsubmit="window.location.reload()">
+        <form action="Toiminta" method="POST">
             Ehdokkaan ID:<br>
             <input type="text" name="LisaaEId" required>
             <br>
